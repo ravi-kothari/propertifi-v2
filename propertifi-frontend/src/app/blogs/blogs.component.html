@@ -1,0 +1,39 @@
+<div class="wrapper">
+   <app-header></app-header>
+
+   <div class="property-section py-60 mt-66 resources-section">
+      <div class="container">
+         <h2 class="text-center">Resources & News</h2>
+
+         <!-- Search Bar -->
+         <div class="search-bar-container">
+             <input type="text" id="search_key" placeholder="Search for property laws, management tips, and more...">
+             <button (click)="searchNow()">Search</button>
+         </div>
+
+         <!-- Category Tabs -->
+         <div class="category-tabs">
+            <button (click)="filterBlog(0)" id="b_f_0" class="tab see-all active b_tab">All</button>
+             <button *ngFor="let blogCategory of blogCategories" [id]="'b_f_'+blogCategory.id" class="tab b_tab" (click)="filterBlog(blogCategory.id)">{{blogCategory.title}}</button>
+             
+         </div>
+
+         <!-- Articles Grid -->
+         <div class="articles-grid">
+
+             <div class="article" *ngFor="let blog of blogs">
+                 <a routerLink="/blog/{{blog.slug}}"><img src="{{blog.blog_banner}}" alt="{{blog.heading}}"></a>
+                 <div class="article-content">
+                     <p class="article-meta">Post on {{blog.post_date}}</p>
+                     <h3>{{blog.heading}}</h3>
+                     <p [innerHTML]="blog.description"></p>
+                 </div>
+             </div>
+
+             
+         </div>
+     </div>
+   </div>
+   <!-- Footer -->
+   <app-footer></app-footer>
+ </div>

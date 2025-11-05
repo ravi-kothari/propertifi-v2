@@ -1,0 +1,9 @@
+.city-box{height: 778px !important;
+    overflow-y: auto;}
+.no-record{text-align: center;
+    border: 1px solid #EEEEEE;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 28px;}
+.state-active{background-color: #1D6AE5; color: #fff;}

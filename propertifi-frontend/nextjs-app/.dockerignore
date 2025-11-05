@@ -1,0 +1,14 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Next.js build output
+.next
+
+# IDE / OS files
+.idea/
+.vscode/
+.DS_Store

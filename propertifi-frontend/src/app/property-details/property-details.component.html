@@ -1,0 +1,39 @@
+
+<div class="wrapper">
+   <app-header></app-header>
+
+   <div class="property-section py-60 mt-66">
+     <div class="container">
+       <div class="row align-items-center">
+         <div class="row pagination mb-5">
+            <div class="col-md-10">
+               <ul class="list-unstyled d-flex align-items-center ">
+                  <li><a routerLink="/" class="" style="color:#000">Home &nbsp; &nbsp; >  &nbsp; &nbsp;</a></li>
+                  <li><a routerLink="/agents/{{state}}/{{city}}" style="color:#000" class="">&nbsp; &nbsp;{{stateName}} &nbsp; &nbsp; >&nbsp; &nbsp;</a></li>
+                  <li><a routerLink="/agents/{{state}}/{{city}}" style="color:#000" class="">&nbsp; &nbsp;{{cityName}} &nbsp; &nbsp; >&nbsp; &nbsp;</a></li>
+                  <li><a href="#" class=" select">&nbsp; &nbsp;{{agentData?.company_name}}&nbsp; &nbsp;</a></li>
+               </ul>
+            </div>
+         </div>
+         <div class="row mt-2">
+            <div class="col-md-8 d-flex align-items-start">
+               <div class="logo-img me-3">
+                  <img style="border: 1px solid #ccc;" src="{{agentData?.photo}}" alt="">
+               </div>
+     
+               <div *ngIf="agentData?.featured" class="featured position-unset rounded">Featured</div>
+            </div>
+         </div>
+         <div class="col-lg-12 col-md-12 mx-md-auto">
+            <h3 class="mt-4">{{agentData?.company_name}}</h3>
+        <p>{{agentData?.address}}</p>
+        <p>{{agentData?.about}}</p>
+         </div>
+       </div>
+     </div>
+   </div>
+ 
+   
+   <!-- Footer -->
+   <app-footer></app-footer>
+ </div>

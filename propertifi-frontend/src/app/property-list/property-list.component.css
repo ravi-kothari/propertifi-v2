@@ -1,0 +1,21 @@
+.img-box {
+    min-height: 212px;
+}
+.property-address{ min-height: 36px;}
+.card.single-property {
+    min-height:494px;
+}
+.about-listing .img-box {
+    background: #eff1f4;
+    padding: 20px;
+    position: relative;
+    border-radius: calc(0.375rem - 1px) calc(0.375rem - 1px) 0 0;
+    text-align: center;
+}
+.img-fluid {
+    max-width: 100%;
+    height: auto;    margin: 0 auto;
+}
+p.property-address {
+    height: 44px;
+}

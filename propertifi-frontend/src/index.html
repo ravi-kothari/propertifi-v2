@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Propertifi - Ai-Driven Property Management Services Platform</title>
+<base href="/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="title" content="Propertifi - Ai-Driven Property Management Services Platform">
+<meta name="description" content="Propertifi is a cutting-edge Ai-enabled property management services platform connecting Rental Property in USA owners with best property managers!"/>
+<meta name="keywords" content="Property Management,Property Management Services,Real Estate Solutions,Rental Property in USA owners ,best property">
+<meta name="robots" content="index,nofollow" />
+
+<link rel="icon" type="image" href="assets/img/favicon.png">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/new/css/animate.css"/>
+<link rel="stylesheet" href="assets/new/css/owl.carousel.css"/>
+<link rel="stylesheet" href="assets/new/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Neuton:ital,wght@0,200;0,300;0,400;0,700;0,800;1,400&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "WebSite",
+    "name": "propertifi",
+    "url": "https://www.propertifi.co/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.propertifi.co/{search_term_string}https://www.propertifi.co/",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Propertifi",
+      "alternateName": "Propertifi",
+      "url": "https://www.propertifi.co/",
+      "logo": "https://www.propertifi.co/assets/img/logo.png",
+      "sameAs": "https://www.propertifi.co/"
+    }
+    </script>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Propertifi",
+    "image": "https://www.propertifi.co/assets/img/logo.png",
+    "@id": "",
+    "url": "https://www.propertifi.co/",
+    "telephone": "9162501264",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "965 university Ave ste 100 , Sacramento",
+      "addressLocality": "Sacramento",
+      "addressRegion": "CA",
+      "postalCode": "95825",
+      "addressCountry": "US"
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "00:00",
+      "closes": "23:59"
+    } 
+  }
+  </script>
+</head>
+
+<body>
+   <app-root></app-root>
+
+
+<!--Java Scripts--> 
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" type="text/javascript"></script> 
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.min.js"></script> 
+<script src="assets/new/js/wow.min.js" type="text/javascript"></script> 
+<script src="assets/new/js/owl.carousel.js" type="text/javascript"></script> 
+<script src="assets/new/js/custom.js" type="text/javascript"></script> 
+<script>
+  $('.test-carousel').owlCarousel({
+    loop:true,
+    margin:10,
+    nav:true,
+    dots:false,
+    autoplay:true,
+    responsive:{
+      0:{
+        items:1
+      },
+      600:{
+        items:1
+      },
+      1000:{
+        items:3
+      }
+    }
+  });
+
+  var tabChange = function () {
+  var tabs = $(".nav-tabs > button");
+  var active = tabs.filter(".active");
+  var next = active.next("button").length
+    ? active.next("button")
+    : tabs.filter(":first-child");
+  next.tab("show");
+};
+var tabCycle = setInterval(tabChange, 2000);
+$(function () {
+  $(".nav-tabs button").click(function(e) {
+    e.preventDefault();
+    clearInterval(tabCycle);
+    $(this).tab("show");
+    setTimeout(function() {
+      tabCycle = setInterval(tabChange, 2000);
+    }, 2000);
+  });
+});
+</script>
+</body>
+</html>

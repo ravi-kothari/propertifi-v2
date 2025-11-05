@@ -1,0 +1,11 @@
+.form-cont form textarea {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E6EA;
+    border-radius: 6px;
+    height: 72px;
+    width: 360px;
+    resize: none;
+    padding: .375rem .75rem;
+}
+.modal-header{background: #0c2867;}
+.btn-close{ background: none !important; opacity:1;margin-right: 10px;}

@@ -1,0 +1,18 @@
+.close-btn{position: absolute;
+    top: 10px;
+    right: 12px;
+    background: #f00;
+    color: #fff;
+    padding: 2px 9px;
+    border-radius: 20px;
+    cursor: pointer;}
+    .btn-edit {
+        background-color: #1D6BE8;
+        color: #fff;
+        margin-top: 10px;
+        font-size: 14px;
+        padding: 4px 7px;
+        border-radius: 4px;
+    }
+    .modal-header{background: #0c2867;}
+    .btn-close{ background: none !important; opacity:1;margin-right: 10px;}

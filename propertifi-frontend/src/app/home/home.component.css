@@ -1,0 +1,118 @@
+.city-box{overflow-y: auto;}
+.no-record{text-align: center;
+    border: 1px solid #EEEEEE;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 28px;}
+.state-active{background-color: #1D6AE5; color: #fff;}
+.close-btn2{position: absolute;
+    top: 10px;
+    right: 12px;
+    background: #f00;
+    color: #fff;
+    padding: 2px 9px;
+    border-radius: 20px;
+    cursor: pointer;}
+    .model-bottom-custom {
+        background: #021885;
+        padding: 12px 13px !important;
+    }
+    .model-top-custom {
+        padding: 23px 27px !important;
+    }
+    .process-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: stretch;
+        margin-bottom: 40px;
+      }
+      
+      .process-step {
+        flex: 1;
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 25px 15px;
+        margin: 0 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        min-height: 180px;
+        justify-content: space-between;
+      }
+      
+      .process-step:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(65, 105, 225, 0.2);
+      }
+      
+      .step-number {
+        background-color: #4169e1;
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 16px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: -15px;
+        left: 20px;
+      }
+      
+      .step-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #222;
+      }
+      
+      .step-description {
+        font-size: 17px;
+        color: #666;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      
+      .footer {
+        text-align: center;
+        margin-top: 50px;
+      }
+      
+      .cta-button {
+        background-color: #4169e1;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-weight: 600;
+      }
+      
+      .cta-button:hover {
+        background-color: #3154c5;
+      }
+      
+      
+      @media (max-width: 900px) {
+        .process-row {
+          flex-direction: column;
+        }
+        
+        .process-step {
+          width: 100%;
+          margin: 10px 0;
+        }
+      }

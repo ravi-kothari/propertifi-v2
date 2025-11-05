@@ -1,0 +1,55 @@
+<div class="wrapper">
+
+   <!-- Modal -->
+   <div class="modal common-modal d-block">
+   <div class="modal-dialog modal-fullscreen">
+       <div class="modal-content">
+       <div class="modal-header">
+           <h1 class="" id="exampleModalLabel"><img src="assets/img/logo.png"/></h1>
+           <a routerLink="/"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#fff" version="1.1" id="Capa_1" viewBox="0 0 512.021 512.021" style="enable-background:new 0 0 512.021 512.021;" xml:space="preserve" width="24" height="24"><g><path d="M301.258,256.01L502.645,54.645c12.501-12.501,12.501-32.769,0-45.269c-12.501-12.501-32.769-12.501-45.269,0l0,0   L256.01,210.762L54.645,9.376c-12.501-12.501-32.769-12.501-45.269,0s-12.501,32.769,0,45.269L210.762,256.01L9.376,457.376   c-12.501,12.501-12.501,32.769,0,45.269s32.769,12.501,45.269,0L256.01,301.258l201.365,201.387   c12.501,12.501,32.769,12.501,45.269,0c12.501-12.501,12.501-32.769,0-45.269L301.258,256.01z"/></g></svg></a>
+       </div>
+       <div class="modal-body">
+           <div class="common-modal-box">
+               <div class="row">
+               <div class="col-md-6 mx-auto">
+                   <h2 class="mb-3 mb-lg-4">Review & Submit</h2>
+                   
+                   <div class="form-cont">
+                     <div class="info-div">
+                     <div><b>Property Type:</b> {{p_type}}</div>
+                     <div><b>Address:</b> {{address}}</div>
+                     <div><b>City:</b> {{city}}</div>
+                     <div><b>Zipcode:</b> {{zip}}</div>
+                     <hr>
+                     <div *ngFor="let single_question of question_answer" class="mb-4">
+                     <b>Q: {{single_question.question}}</b> <br>
+                     A: {{single_question.answer}}
+                     </div>
+                     <hr>
+                     <div><b>Name:</b> {{full_name}}</div>
+                     <div><b>Email:</b> {{email_address}}</div>
+                     <div><b>Phone:</b> {{phone_no}}</div>
+                     <div><b>Preferred Contact Method:</b> {{preferred_contact_method}}</div>
+                     <hr>
+                     <div class="row">
+                        <div class="col-3"> <a routerLink="/search" class="btn-edit">Edit Property Type</a></div>
+                        <div class="col-3"> <a routerLink="/search-two" class="btn-edit">Edit Address</a></div>
+                        <div class="col-3"> <a routerLink="/search-three" class="btn-edit">Edit Property Details</a></div>
+                        <div class="col-3"> <a routerLink="/search-four" class="btn-edit">Edit Contact Info.</a></div>
+                     </div>
+      
+                     </div>
+                     </div>
+
+               </div>
+               </div>
+           </div>
+       </div>
+       <div class="modal-footer align-items-center justify-content-center px-0">
+         <a routerLink="/search-four" class="btn btn-primary">Previous</a>
+           <a (click)="saveNext()" class="btn btn-primary" id="submitBtn" style="cursor:pointer" >Submit</a>
+       </div>
+       </div>
+   </div>
+   </div>
+</div>

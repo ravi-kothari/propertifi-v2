@@ -1,0 +1,65 @@
+
+<div class="wrapper">
+   <app-header></app-header>
+
+   <div class="property-section py-60 mt-66">
+     <div class="container">
+
+      <div class="row pagination">
+         <div class="col-md-10">
+            <ul class="list-unstyled d-flex align-items-center ">
+               <li><a href="" style="color:#000" class="">Home &nbsp; &nbsp; >  &nbsp; &nbsp;</a></li>
+               <li><a href="" style="color:#000" class="">&nbsp; &nbsp;Laws &nbsp; &nbsp; >&nbsp; &nbsp;</a></li>
+               <li><a href="" class="">&nbsp; &nbsp;{{stateName}}&nbsp; &nbsp;</a></li>
+            </ul>
+         </div>
+      </div>
+
+      <div class="row mt-2">
+         <div class="col-md-12">
+            <div class="logo-img prerty-img-top me-3">
+               <img width="100%" src="assets/img/property_detial_img.jpg" alt="" width="100%" class="img-fluid">
+            </div>
+         </div>
+      </div>
+
+       <div class="row align-items-center mt-5">
+         
+         <div class="col-lg-12 col-md-12 mx-md-auto">
+            <div *ngFor="let pageData of laws?.scrapedData">
+               <h3 *ngIf="pageData.sectionTitle != 'Explore Property Management' && pageData.sectionTitle != 'About Us' && pageData.sectionTitle != 'Got Questions?'">{{pageData.sectionTitle}}</h3>
+               <div *ngFor="let textData of pageData?.content">
+                  <p *ngIf="textData.question"><b [innerHTML]="textData.question"></b></p>
+                  <p *ngIf="textData.answer" [innerHTML]="textData.answer"></p>
+                  <p *ngIf="textData.content" [innerHTML]="textData.content"></p>
+                  <ul *ngIf="textData.items && textData.items.length > 0" class="property-list-icon">
+                     <li *ngFor="let item of textData.items" [innerHTML]="item"></li>
+                  </ul>
+                  <div *ngIf="textData.rows && textData.rows.length > 0" class="table-responsive-wrap">
+                     <div class="table-responsive">
+                        <table class="table" style="width: 100%; height: 312px">
+                           <tbody>
+                           <tr style="height: 48px">
+                           <th style="height: 48px;">Code</th>
+                           <th style="height: 48px;">Description</th>
+                           </tr>
+                           <tr style="height: 24px"  *ngFor="let item of textData.rows" >
+                           <td style="height: 24px;"><span *ngIf="item[0] != ''"><div [innerHTML]="item[0]"></div></span><span *ngIf="!item[0] || item[0] == ''">--</span></td>
+                           <td style="height: 24px;"><span *ngIf="item[1] != ''">{{item[1]}}</span><span *ngIf="!item[1] || item[1] == ''">--</span></td>
+                           </tr>
+                           
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+       </div>
+     </div>
+   </div>
+ 
+   
+   <!-- Footer -->
+   <app-footer></app-footer>
+ </div>
