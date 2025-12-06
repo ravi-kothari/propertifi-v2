@@ -1,0 +1,296 @@
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { of } from 'rxjs';
+import { map, catchError, exhaustMap, tap } from 'rxjs/operators';
+import { AuthService } from '../../auth/auth.service';
+import * as AuthActions from './auth.actions';
+
+/**
+ * Authentication Effects
+ *
+ * Effects are where side effects are handled in NgRx applications.
+ * Side effects include:
+ * - API calls
+ * - localStorage operations
+ * - Navigation
+ * - Logging
+ * - Any other operations that interact with the outside world
+ *
+ * Effects listen to actions dispatched from the Store, perform side effects,
+ * and then dispatch new actions based on the results.
+ *
+ * Key RxJS operators used:
+ * - ofType: Filters actions to only those we care about
+ * - exhaustMap: Ignores new actions while previous operation is in progress
+ *               (prevents multiple login attempts while one is pending)
+ * - map: Transforms the result into a new action
+ * - catchError: Handles errors by dispatching failure actions
+ * - tap: Performs side effects without changing the stream (e.g., navigation)
+ */
+@Injectable()
+export class AuthEffects {
+  /**
+   * Inject dependencies using the modern Angular inject() function.
+   * This is preferred over constructor injection in Angular 14+.
+   */
+  private actions$ = inject(Actions);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  /**
+   * Login Effect
+   *
+   * Listens for: AuthActions.login
+   * Side effects: Call backend API via AuthService
+   * Dispatches: loginSuccess on success, loginFailure on error
+   *
+   * Flow:
+   * 1. User submits login form -> component dispatches login action
+   * 2. This effect catches the action and calls AuthService.login()
+   * 3. On success, dispatches loginSuccess with user and token
+   * 4. On failure, dispatches loginFailure with error message
+   *
+   * Note: AuthService.login() already saves token/user to localStorage,
+   * so we don't duplicate that logic here.
+   *
+   * exhaustMap is used to prevent multiple concurrent login attempts.
+   * If user clicks login button multiple times, only the first click
+   * will trigger the API call.
+   */
+  login$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.login),
+      exhaustMap(({ email, password }) =>
+        this.authService.login({ email, password }).pipe(
+          map(({ user, access_token }) => {
+            // AuthService already handles localStorage - we just dispatch success
+            return AuthActions.loginSuccess({ user, token: access_token });
+          }),
+          catchError((error) =>
+            of(AuthActions.loginFailure({ error: error.message || 'Login failed' }))
+          )
+        )
+      )
+    )
+  );
+
+  /**
+   * Login Success Effect
+   *
+   * Listens for: AuthActions.loginSuccess
+   * Side effects: Navigate to appropriate dashboard based on user type
+   * Dispatches: Nothing (dispatch: false)
+   *
+   * This is a "dispatch: false" effect because it only performs navigation.
+   * Navigation is a side effect that doesn't need to dispatch another action.
+   *
+   * Route mapping by user type:
+   * - admin -> /admin (admin dashboard)
+   * - owner -> /dashboard/owner (owner dashboard)
+   * - pm -> /dashboard/pm (property manager dashboard)
+   */
+  loginSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.loginSuccess),
+        tap(({ user }) => {
+          // Navigate based on user type
+          if (user.type === 'admin') {
+            this.router.navigate(['/admin']);
+          } else if (user.type === 'owner') {
+            this.router.navigate(['/dashboard/owner']);
+          } else if (user.type === 'pm') {
+            this.router.navigate(['/dashboard/pm']);
+          }
+        })
+      ),
+    { dispatch: false } // This effect doesn't dispatch another action
+  );
+
+  /**
+   * Register Effect
+   *
+   * Listens for: AuthActions.register
+   * Side effects: Call backend API to create new user account
+   * Dispatches: registerSuccess on success, registerFailure on error
+   *
+   * Flow:
+   * 1. User submits registration form -> component dispatches register action
+   * 2. This effect catches the action and calls AuthService.register()
+   * 3. Backend creates user and returns user object + token
+   * 4. On success, dispatches registerSuccess (user is now logged in)
+   * 5. On failure, dispatches registerFailure with error message
+   *
+   * Note: Password confirmation is handled by duplicating the password
+   * since the backend expects password_confirmation field.
+   */
+  register$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.register),
+      exhaustMap(({ email, password, name, role }) =>
+        this.authService.register({
+          name,
+          email,
+          password,
+          password_confirmation: password // Backend expects this field
+        }).pipe(
+          map(({ user, access_token }) => {
+            // AuthService already handles localStorage
+            return AuthActions.registerSuccess({ user, token: access_token });
+          }),
+          catchError((error) =>
+            of(AuthActions.registerFailure({ error: error.message || 'Registration failed' }))
+          )
+        )
+      )
+    )
+  );
+
+  /**
+   * Register Success Effect
+   *
+   * Listens for: AuthActions.registerSuccess
+   * Side effects: Navigate to email verification page
+   * Dispatches: Nothing (dispatch: false)
+   *
+   * After successful registration, the user is authenticated but their
+   * email is not verified. We redirect them to the verification page
+   * where they'll be prompted to check their email.
+   */
+  registerSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.registerSuccess),
+        tap(() => {
+          this.router.navigate(['/auth/verify-email']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  /**
+   * Logout Effect
+   *
+   * Listens for: AuthActions.logout
+   * Side effects: Call AuthService.logout() to clear session
+   * Dispatches: logoutSuccess
+   *
+   * AuthService.logout() is a void method that:
+   * - Clears localStorage (token, user)
+   * - Optionally calls backend to invalidate token
+   * - Performs any other cleanup
+   *
+   * We always dispatch logoutSuccess, even if backend call fails,
+   * because we want to clear local state regardless.
+   */
+  logout$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.logout),
+      tap(() => {
+        // AuthService.logout() handles all cleanup
+        this.authService.logout();
+      }),
+      map(() => AuthActions.logoutSuccess())
+    )
+  );
+
+  /**
+   * Logout Success Effect
+   *
+   * Listens for: AuthActions.logoutSuccess
+   * Side effects: Navigate to login page
+   * Dispatches: Nothing (dispatch: false)
+   *
+   * After logout is complete and state is cleared, redirect user
+   * to the login page so they can authenticate again.
+   */
+  logoutSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logoutSuccess),
+        tap(() => {
+          // Navigate to login page
+          this.router.navigate(['/auth/login']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  /**
+   * Refresh User Effect
+   *
+   * Listens for: AuthActions.refreshUser
+   * Side effects: Load user from localStorage (backend endpoint not implemented yet)
+   * Dispatches: refreshUserSuccess with user data, or refreshUserFailure
+   *
+   * TODO: This should call a backend endpoint like GET /api/user to fetch
+   * the latest user data. Currently, it just reads from localStorage as a
+   * temporary implementation.
+   *
+   * Use cases:
+   * - After updating user profile
+   * - Periodically to sync remote changes
+   * - When resuming a session
+   */
+  refreshUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.refreshUser),
+      map(() => {
+        // TODO: Replace with actual API call when backend endpoint exists
+        // For now, just reload from localStorage
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          return AuthActions.refreshUserSuccess({ user });
+        }
+        return AuthActions.refreshUserFailure({ error: 'No user in storage' });
+      })
+    )
+  );
+
+  /**
+   * Load Auth From Storage Effect
+   *
+   * Listens for: AuthActions.loadAuthFromStorage
+   * Side effects: Read token and user from localStorage
+   * Dispatches: loginSuccess if found, logoutSuccess if not found
+   *
+   * This effect should be dispatched when the app initializes (in app.component.ts)
+   * to restore the authentication state from a previous session.
+   *
+   * Flow:
+   * 1. App starts -> app.component dispatches loadAuthFromStorage
+   * 2. This effect reads localStorage
+   * 3. If token and user exist -> dispatch loginSuccess (user is logged in)
+   * 4. If not found -> dispatch logoutSuccess (clean initial state)
+   *
+   * This allows users to remain logged in across browser sessions
+   * as long as their token hasn't expired.
+   */
+  loadAuthFromStorage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loadAuthFromStorage),
+      map(() => {
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+
+        if (token && userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            // Restore session from localStorage
+            return AuthActions.loginSuccess({ user, token });
+          } catch (error) {
+            // Invalid JSON in localStorage - clear it
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            return AuthActions.logoutSuccess();
+          }
+        }
+
+        // No stored session - start with clean state
+        return AuthActions.logoutSuccess();
+      })
+    )
+  );
+}
