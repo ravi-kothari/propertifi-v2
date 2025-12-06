@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,16 +8,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, X, MapPin, Home, Building, Factory, Map } from 'lucide-react';
+import { Loader2, MapPin, Home, Building, Factory, Map } from 'lucide-react';
 import type { PreferencesData } from '../page';
+import LocationSelection from '@/components/maps/LocationSelection';
 
 const leadCriteriaSchema = z.object({
   property_types: z.array(z.string()).min(1, 'Select at least one property type'),
-  zip_codes: z.array(z.string()).min(1, 'Add at least one ZIP code'),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
   min_units: z.number().nullable(),
   max_units: z.number().nullable(),
-  service_radius_miles: z.number().min(0).max(500),
+  service_radius_miles: z.number().min(1).max(100),
 }).refine((data) => {
   if (data.min_units !== null && data.max_units !== null) {
     return data.min_units <= data.max_units;
@@ -27,6 +27,9 @@ const leadCriteriaSchema = z.object({
 }, {
   message: 'Min units must be less than or equal to max units',
   path: ['min_units'],
+}).refine(data => data.latitude && data.longitude, {
+  message: "Please set your service area on the map by searching for your business address",
+  path: ["latitude"],
 });
 
 type LeadCriteriaFormData = z.infer<typeof leadCriteriaSchema>;
@@ -46,8 +49,6 @@ const PROPERTY_TYPES = [
 ];
 
 export default function LeadCriteriaTab({ data, onSave, isSaving }: LeadCriteriaTabProps) {
-  const [zipCodeInput, setZipCodeInput] = useState('');
-
   const {
     register,
     handleSubmit,
@@ -59,7 +60,8 @@ export default function LeadCriteriaTab({ data, onSave, isSaving }: LeadCriteria
     resolver: zodResolver(leadCriteriaSchema),
     defaultValues: {
       property_types: data?.leadCriteria.property_types || [],
-      zip_codes: data?.leadCriteria.zip_codes || [],
+      latitude: data?.leadCriteria.latitude || 34.0522, // Default to LA
+      longitude: data?.leadCriteria.longitude || -118.2437, // Default to LA
       min_units: data?.leadCriteria.min_units || null,
       max_units: data?.leadCriteria.max_units || null,
       service_radius_miles: data?.leadCriteria.service_radius_miles || 25,
@@ -67,34 +69,12 @@ export default function LeadCriteriaTab({ data, onSave, isSaving }: LeadCriteria
   });
 
   const propertyTypes = watch('property_types');
-  const zipCodes = watch('zip_codes');
+  const latitude = watch('latitude');
+  const longitude = watch('longitude');
   const serviceRadius = watch('service_radius_miles');
 
   const onSubmit = (formData: LeadCriteriaFormData) => {
     onSave({ leadCriteria: formData });
-  };
-
-  const handleAddZipCode = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const trimmed = zipCodeInput.trim();
-
-      // Validate ZIP code format (5 digits)
-      if (/^\d{5}$/.test(trimmed)) {
-        if (!zipCodes.includes(trimmed)) {
-          setValue('zip_codes', [...zipCodes, trimmed], { shouldDirty: true });
-          setZipCodeInput('');
-        }
-      }
-    }
-  };
-
-  const handleRemoveZipCode = (zipToRemove: string) => {
-    setValue(
-      'zip_codes',
-      zipCodes.filter((zip) => zip !== zipToRemove),
-      { shouldDirty: true }
-    );
   };
 
   const togglePropertyType = (typeId: string) => {
@@ -151,50 +131,31 @@ export default function LeadCriteriaTab({ data, onSave, isSaving }: LeadCriteria
         )}
       </div>
 
-      {/* Service Areas (ZIP Codes) */}
+      {/* Service Area Map */}
       <div className="space-y-3">
-        <Label htmlFor="zip_code_input" className="flex items-center gap-2">
+        <Label className="flex items-center gap-2">
           <MapPin className="h-4 w-4" />
-          Service Areas (ZIP Codes) *
+          Service Area *
         </Label>
         <p className="text-sm text-gray-600">
-          Add ZIP codes where you want to receive leads. Press Enter after typing each ZIP code.
+          Define your service area by searching for your business address and adjusting the radius.
         </p>
 
-        <Input
-          id="zip_code_input"
-          value={zipCodeInput}
-          onChange={(e) => setZipCodeInput(e.target.value)}
-          onKeyDown={handleAddZipCode}
-          placeholder="Enter 5-digit ZIP code and press Enter"
-          maxLength={5}
-          className="font-mono"
+        <LocationSelection
+          center={{ lat: latitude!, lng: longitude! }}
+          radius={serviceRadius * 1609.34} // Convert miles to meters
+          onLocationChange={(newLat, newLng) => {
+            setValue('latitude', newLat, { shouldDirty: true });
+            setValue('longitude', newLng, { shouldDirty: true });
+          }}
+          onRadiusChange={(newRadius) => {
+            // Convert meters to miles and round
+            setValue('service_radius_miles', Math.round(newRadius / 1609.34), { shouldDirty: true });
+          }}
         />
 
-        {/* ZIP Code Tags */}
-        {zipCodes.length > 0 && (
-          <div className="flex flex-wrap gap-2 p-3 border rounded-lg bg-gray-50">
-            {zipCodes.map((zip) => (
-              <Badge
-                key={zip}
-                variant="secondary"
-                className="flex items-center gap-1 px-3 py-1 text-sm"
-              >
-                {zip}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveZipCode(zip)}
-                  className="ml-1 hover:text-red-600 transition-colors"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {errors.zip_codes && (
-          <p className="text-sm text-red-600">{errors.zip_codes.message}</p>
+        {errors.latitude && (
+          <p className="text-sm text-red-600">{errors.latitude.message}</p>
         )}
       </div>
 
@@ -204,7 +165,7 @@ export default function LeadCriteriaTab({ data, onSave, isSaving }: LeadCriteria
           Service Radius: {serviceRadius} miles
         </Label>
         <p className="text-sm text-gray-600">
-          Maximum distance from your ZIP codes to receive leads
+          Maximum distance from your business location to receive leads (drag the circle edge on the map or use the slider)
         </p>
         <Controller
           name="service_radius_miles"
@@ -213,15 +174,15 @@ export default function LeadCriteriaTab({ data, onSave, isSaving }: LeadCriteria
             <Slider
               value={[field.value]}
               onValueChange={(values) => field.onChange(values[0])}
-              max={500}
-              step={5}
+              max={100}
+              step={1}
               className="w-full"
             />
           )}
         />
         <div className="flex justify-between text-xs text-gray-500">
-          <span>0 miles</span>
-          <span>500 miles</span>
+          <span>1 mile</span>
+          <span>100 miles</span>
         </div>
       </div>
 

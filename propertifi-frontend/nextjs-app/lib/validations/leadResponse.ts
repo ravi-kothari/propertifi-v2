@@ -45,9 +45,7 @@ export const priceQuoteSchema = z.object({
   amount: z.number().min(0, 'Amount must be positive').or(
     z.string().min(1, 'Amount is required').transform((val) => parseFloat(val))
   ),
-  frequency: z.enum(['monthly', 'yearly', 'one-time'], {
-    required_error: 'Frequency is required',
-  }),
+  frequency: z.enum(['monthly', 'yearly', 'one-time']),
   details: z.string().min(10, 'Please provide details about your quote').max(1000),
   includes: z.array(z.string()).optional(),
   valid_until: z.string().optional(),
@@ -60,9 +58,7 @@ export type PriceQuoteFormData = z.infer<typeof priceQuoteSchema>;
 // ============================================================================
 
 export const responseFormSchema = z.object({
-  response_type: z.enum(['contact_info', 'availability', 'price_quote', 'decline'], {
-    required_error: 'Please select a response type',
-  }),
+  response_type: z.enum(['contact_info', 'availability', 'price_quote', 'decline']),
   message: z.string()
     .min(10, 'Message must be at least 10 characters')
     .max(1000, 'Message must be less than 1000 characters'),

@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import ProfileTab from './components/ProfileTab';
 import LeadCriteriaTab from './components/LeadCriteriaTab';
@@ -22,7 +22,7 @@ export interface PreferencesData {
   };
   leadCriteria: {
     property_types: string[];
-    zip_codes: string[];
+    zip_codes?: string[]; // Optional for backward compatibility
     min_units: number | null;
     max_units: number | null;
     service_radius_miles: number;
@@ -76,7 +76,6 @@ async function updatePreferences(data: Partial<PreferencesData>): Promise<{ data
 
 export default function PreferencesPage() {
   const [activeTab, setActiveTab] = useState('profile');
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Fetch preferences

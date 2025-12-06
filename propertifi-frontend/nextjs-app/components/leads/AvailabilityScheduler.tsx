@@ -33,9 +33,9 @@ export default function AvailabilityScheduler({ form }: AvailabilitySchedulerPro
             min={today}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
-          {errors.availability?.date && (
+          {(errors.availability as any)?.date && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.availability.date.message as string}
+              {(errors.availability as any).date.message as string}
             </p>
           )}
         </div>
@@ -51,9 +51,9 @@ export default function AvailabilityScheduler({ form }: AvailabilitySchedulerPro
             id="availability.time"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
-          {errors.availability?.time && (
+          {(errors.availability as any)?.time && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.availability.time.message as string}
+              {(errors.availability as any).time.message as string}
             </p>
           )}
         </div>
@@ -71,9 +71,9 @@ export default function AvailabilityScheduler({ form }: AvailabilitySchedulerPro
           placeholder="e.g., Property address, Coffee shop, Virtual meeting"
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         />
-        {errors.availability?.location && (
+        {(errors.availability as any)?.location && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.availability.location.message as string}
+            {(errors.availability as any).location.message as string}
           </p>
         )}
       </div>
@@ -90,9 +90,9 @@ export default function AvailabilityScheduler({ form }: AvailabilitySchedulerPro
           placeholder="Any special instructions or alternative times..."
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         />
-        {errors.availability?.notes && (
+        {(errors.availability as any)?.notes && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.availability.notes.message as string}
+            {(errors.availability as any).notes.message as string}
           </p>
         )}
       </div>

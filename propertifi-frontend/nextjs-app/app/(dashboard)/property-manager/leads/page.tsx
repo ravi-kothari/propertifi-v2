@@ -5,8 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import { LeadCardEnhanced } from '@/components/leads/LeadCardEnhanced';
 import { LeadKanban } from '@/components/leads/LeadKanban';
 import LeadDetailModal from '@/components/leads/LeadDetailModal';
-import { Lead } from '@/types/leads';
-import { getLeads } from '@/lib/leads-api';
+import { Lead, LeadWithAssignment } from '@/types/leads';
+import { getPMLeads } from '@/lib/leads-api';
+import { UpgradeBanner } from '@/components/pm/UpgradeBanner';
 import {
   Zap,
   LayoutList,
@@ -70,10 +71,7 @@ async function fetchLeadScores(): Promise<ScoredLead[]> {
 }
 
 export default function PropertyManagerPage() {
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedLead, setSelectedLead] = useState<LeadWithAssignment | null>(null);
 
   // View and filter state
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
@@ -82,29 +80,25 @@ export default function PropertyManagerPage() {
   const [propertyTypeFilter, setPropertyTypeFilter] = useState('all');
   const [selectedLeads, setSelectedLeads] = useState<number[]>([]);
 
+  // Fetch PM leads with tiered access filtering
+  const { data: leadsData, isLoading, error } = useQuery({
+    queryKey: ['pm-leads', statusFilter],
+    queryFn: () => getPMLeads({
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      sort_by: 'created_at',
+      sort_order: 'desc',
+      per_page: 100,
+    }),
+    refetchInterval: 60000, // Refetch every minute to check for newly available leads
+  });
+
+  const leads = leadsData?.leads || [];
+
   // Fetch AI scores
   const { data: scoredLeads } = useQuery<ScoredLead[]>({
     queryKey: ['lead-scores'],
     queryFn: fetchLeadScores,
   });
-
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedLeads = await getLeads();
-        setLeads(fetchedLeads);
-        setError(null);
-      } catch (err: any) {
-        console.error('Error fetching leads:', err);
-        setError(err.message || 'Failed to load leads');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchLeads();
-  }, []);
 
   // Create a map of lead scores
   const scoreMap = new Map(
@@ -124,11 +118,9 @@ export default function PropertyManagerPage() {
         const query = searchQuery.toLowerCase();
         const matchesSearch =
           lead.full_name?.toLowerCase().includes(query) ||
-          lead.name?.toLowerCase().includes(query) ||
           lead.email?.toLowerCase().includes(query) ||
           lead.city?.toLowerCase().includes(query) ||
-          lead.street_address?.toLowerCase().includes(query) ||
-          lead.address?.toLowerCase().includes(query);
+          lead.street_address?.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
 
@@ -146,6 +138,10 @@ export default function PropertyManagerPage() {
     });
   }, [leads, searchQuery, statusFilter, propertyTypeFilter]);
 
+  // Mock tier - in production this comes from user profile
+  const userTier = 'free';
+  const missedLeadsCount = 5; // This would come from API
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -161,6 +157,9 @@ export default function PropertyManagerPage() {
           Manage and track your property leads
         </p>
       </div>
+
+      {/* Upgrade Banner for Free Tier */}
+      <UpgradeBanner tier={userTier} missedLeadsCount={missedLeadsCount} />
 
       {/* Filters and Actions Bar */}
       <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -210,23 +209,27 @@ export default function PropertyManagerPage() {
             </Select>
 
             {/* View Toggle */}
-            <div className="flex border border-gray-200 rounded-lg">
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                size="sm"
+            <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+              <button
                 onClick={() => setViewMode('list')}
-                className={viewMode === 'list' ? '' : 'text-gray-600'}
+                className={`inline-flex items-center justify-center h-8 px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                  viewMode === 'list'
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    : 'bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
               >
                 <LayoutList className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'kanban' ? 'default' : 'ghost'}
-                size="sm"
+              </button>
+              <button
                 onClick={() => setViewMode('kanban')}
-                className={viewMode === 'kanban' ? '' : 'text-gray-600'}
+                className={`inline-flex items-center justify-center h-8 px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                  viewMode === 'kanban'
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    : 'bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
               >
                 <LayoutGrid className="h-4 w-4" />
-              </Button>
+              </button>
             </div>
 
             {/* Bulk Actions */}
@@ -269,7 +272,7 @@ export default function PropertyManagerPage() {
         </div>
       ) : error ? (
         <div className="text-center py-12 bg-red-50 rounded-lg">
-          <p className="text-red-600">{error}</p>
+          <p className="text-red-600">{error instanceof Error ? error.message : 'Failed to load leads'}</p>
         </div>
       ) : filteredLeads.length === 0 ? (
         <div className="text-center py-12 bg-white border border-gray-200 rounded-lg">

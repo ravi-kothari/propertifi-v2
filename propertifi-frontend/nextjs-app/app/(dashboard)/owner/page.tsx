@@ -1,343 +1,210 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import {
-  Building2,
-  Users,
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  Home,
-  Wrench,
-  FileText,
-  Calendar,
-  ArrowUpRight,
-} from 'lucide-react';
-import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+  PlusIcon,
+  MagnifyingGlassIcon,
+  ClipboardDocumentListIcon,
+} from '@heroicons/react/24/outline';
+import { useAuth } from '@/hooks/useAuth';
+import { getDashboardData } from '@/lib/owner-api';
+import { DashboardStats } from '@/components/owner/DashboardStats';
+import { LeadCard } from '@/components/owner/LeadCard';
+import { RecentActivity } from '@/components/owner/RecentActivity';
+import { EmptyState } from '@/components/owner/EmptyState';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
-// Mock data for property owner dashboard
-const portfolioMetrics = {
-  totalValue: 2450000,
-  monthlyRevenue: 18500,
-  occupancyRate: 94,
-  roi: 12.5,
-  properties: 4,
-  units: 47,
-};
+export default function OwnerDashboard() {
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
 
-const properties = [
-  {
-    id: 1,
-    name: 'Sunset Apartments',
-    address: '456 Oak Street, Austin, TX',
-    units: 12,
-    occupancy: 11,
-    monthlyRevenue: 8400,
-    manager: 'John Smith',
-    value: 850000,
-  },
-  {
-    id: 2,
-    name: 'Downtown Lofts',
-    address: '123 Main Street, Los Angeles, CA',
-    units: 20,
-    occupancy: 19,
-    monthlyRevenue: 12000,
-    manager: 'Sarah Johnson',
-    value: 1200000,
-  },
-  {
-    id: 3,
-    name: 'Harbor View Complex',
-    address: '789 Beach Ave, Miami, FL',
-    units: 10,
-    occupancy: 9,
-    monthlyRevenue: 6800,
-    manager: 'Mike Davis',
-    value: 650000,
-  },
-  {
-    id: 4,
-    name: 'Oak Street Residences',
-    address: '321 Oak St, Seattle, WA',
-    units: 5,
-    occupancy: 5,
-    monthlyRevenue: 4500,
-    manager: 'Emily Brown',
-    value: 420000,
-  },
-];
+  // Prevent hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-const recentActivity = [
-  { type: 'payment', message: 'Rent payment received - Unit 4B', property: 'Sunset Apartments', time: '2 hours ago', amount: '$1,200' },
-  { type: 'maintenance', message: 'Maintenance request completed', property: 'Downtown Lofts', time: '5 hours ago' },
-  { type: 'lease', message: 'New lease signed - Unit 12A', property: 'Harbor View Complex', time: '1 day ago' },
-  { type: 'report', message: 'Monthly financial report available', property: 'All Properties', time: '2 days ago' },
-];
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (isMounted && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isMounted, isAuthenticated, router]);
 
-const maintenanceRequests = [
-  { id: 1, property: 'Sunset Apartments', unit: '4B', issue: 'Leaking faucet', status: 'in_progress', priority: 'medium', date: '2025-01-02' },
-  { id: 2, property: 'Downtown Lofts', unit: '12A', issue: 'AC not working', status: 'pending', priority: 'high', date: '2025-01-03' },
-  { id: 3, property: 'Harbor View Complex', unit: '7C', issue: 'Window replacement', status: 'completed', priority: 'low', date: '2024-12-28' },
-];
+  // Fetch dashboard data
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['owner-dashboard'],
+    queryFn: getDashboardData,
+    enabled: isMounted && isAuthenticated,
+  });
 
-function StatCard({ title, value, change, icon: Icon, trend, prefix, suffix }: any) {
-  const isPositive = trend === 'up';
-  const TrendIcon = isPositive ? TrendingUp : TrendingDown;
+  // Don't render until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading dashboard</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardDescription className="text-sm font-medium">{title}</CardDescription>
-          <div className={`p-2 rounded-lg ${isPositive ? 'bg-green-50' : 'bg-blue-50'}`}>
-            <Icon className={`h-5 w-5 ${isPositive ? 'text-green-600' : 'text-blue-600'}`} />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold text-gray-900">
-          {prefix}{value}{suffix}
-        </div>
-        {change && (
-          <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            <TrendIcon className="h-4 w-4" />
-            <span>{change} vs last month</span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-export default function OwnerDashboardPage() {
-  return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Portfolio Overview</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Track your real estate investments and property performance
+    <div className="space-y-8">
+      {/* Welcome Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          Welcome back, {user?.name?.split(' ')[0]}!
+        </h1>
+        <p className="text-gray-600">
+          Here's what's happening with your property search
         </p>
-      </div>
+      </motion.div>
 
-      {/* KPI Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Portfolio Value"
-          value={portfolioMetrics.totalValue.toLocaleString()}
-          prefix="$"
-          change="+5.2%"
-          icon={Building2}
-          trend="up"
-        />
-        <StatCard
-          title="Monthly Revenue"
-          value={portfolioMetrics.monthlyRevenue.toLocaleString()}
-          prefix="$"
-          change="+8.3%"
-          icon={DollarSign}
-          trend="up"
-        />
-        <StatCard
-          title="Occupancy Rate"
-          value={portfolioMetrics.occupancyRate}
-          suffix="%"
-          change="+2.1%"
-          icon={Home}
-          trend="up"
-        />
-        <StatCard
-          title="Annual ROI"
-          value={portfolioMetrics.roi}
-          suffix="%"
-          change="+1.5%"
-          icon={TrendingUp}
-          trend="up"
-        />
-      </div>
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="flex flex-wrap gap-4"
+      >
+        <Button
+          size="lg"
+          onClick={() => router.push('/get-started')}
+          className="gap-2"
+        >
+          <PlusIcon className="h-5 w-5" />
+          Submit New Lead
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          onClick={() => router.push('/property-managers')}
+          className="gap-2"
+        >
+          <MagnifyingGlassIcon className="h-5 w-5" />
+          Find Managers
+        </Button>
+      </motion.div>
 
-      {/* Property Portfolio */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Statistics Cards */}
+      <DashboardStats stats={data.stats} />
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Recent Leads */}
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Property Portfolio</CardTitle>
-                  <CardDescription>Performance overview of your {portfolioMetrics.properties} properties</CardDescription>
-                </div>
-                <Link href="/owner/properties">
-                  <Button variant="outline" size="sm">
-                    View All
-                    <ArrowUpRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </Link>
+                <CardTitle>Recent Leads</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.push('/owner/leads')}
+                >
+                  View All
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {properties.map((property) => {
-                  const occupancyRate = Math.round((property.occupancy / property.units) * 100);
-                  return (
-                    <div key={property.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors">
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-gray-900">{property.name}</h3>
-                            <p className="text-sm text-gray-600">{property.address}</p>
-                          </div>
-                          <span className="text-lg font-bold text-indigo-600">
-                            ${property.monthlyRevenue.toLocaleString()}/mo
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 mt-3">
-                          <div>
-                            <p className="text-xs text-gray-500">Units</p>
-                            <p className="text-sm font-semibold text-gray-900">{property.units}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500">Occupancy</p>
-                            <p className={`text-sm font-semibold ${occupancyRate >= 90 ? 'text-green-600' : occupancyRate >= 75 ? 'text-yellow-600' : 'text-red-600'}`}>
-                              {occupancyRate}%
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500">Manager</p>
-                            <p className="text-sm font-medium text-gray-700">{property.manager}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              {data.recent_leads && data.recent_leads.length > 0 ? (
+                <div className="space-y-4">
+                  {data.recent_leads.slice(0, 3).map((lead) => (
+                    <LeadCard
+                      key={lead.id}
+                      lead={lead}
+                      onViewDetails={(lead) =>
+                        router.push(`/owner/leads/${lead.id}`)
+                      }
+                    />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={ClipboardDocumentListIcon}
+                  title="No Leads Yet"
+                  description="Submit your first property lead to get matched with property managers."
+                  actionLabel="Submit a Lead"
+                  onAction={() => router.push('/get-started')}
+                />
+              )}
             </CardContent>
           </Card>
         </div>
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest updates from your properties</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivity.map((activity, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    activity.type === 'payment' ? 'bg-green-50' :
-                    activity.type === 'maintenance' ? 'bg-yellow-50' :
-                    activity.type === 'lease' ? 'bg-blue-50' :
-                    'bg-purple-50'
-                  }`}>
-                    {activity.type === 'payment' && <DollarSign className="h-4 w-4 text-green-600" />}
-                    {activity.type === 'maintenance' && <Wrench className="h-4 w-4 text-yellow-600" />}
-                    {activity.type === 'lease' && <FileText className="h-4 w-4 text-blue-600" />}
-                    {activity.type === 'report' && <FileText className="h-4 w-4 text-purple-600" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{activity.message}</p>
-                    <p className="text-xs text-gray-600 mt-0.5">{activity.property}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{activity.time}</p>
-                  </div>
-                  {activity.amount && (
-                    <span className="text-sm font-semibold text-green-600">{activity.amount}</span>
-                  )}
-                </div>
-              ))}
+        <div className="lg:col-span-1">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RecentActivity activities={data.recent_activity || []} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Tips Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">💡</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Quick Tip
+                </h3>
+                <p className="text-gray-700">
+                  Save property managers you're interested in to easily contact them
+                  later. You can also save your calculator results to compare different
+                  investment scenarios.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Maintenance Requests */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Maintenance Requests</CardTitle>
-              <CardDescription>Track ongoing and pending maintenance issues</CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              View All
-              <ArrowUpRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Property</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Unit</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Issue</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Priority</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {maintenanceRequests.map((request) => (
-                  <tr key={request.id} className="hover:bg-gray-50">
-                    <td className="py-3 px-4 text-sm font-medium text-gray-900">{request.property}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{request.unit}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{request.issue}</td>
-                    <td className="py-3 px-4 text-sm">
-                      <Badge className={
-                        request.priority === 'high' ? 'bg-red-100 text-red-700' :
-                        request.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-blue-100 text-blue-700'
-                      }>
-                        {request.priority}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm">
-                      <Badge className={
-                        request.status === 'completed' ? 'bg-green-100 text-green-700' :
-                        request.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-700'
-                      }>
-                        {request.status.replace('_', ' ')}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {new Date(request.date).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Actions */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-lg p-6 text-white">
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Link href="/owner/properties" className="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-colors">
-            <Building2 className="h-6 w-6 mx-auto mb-2" />
-            <span className="text-sm font-medium">My Properties</span>
-          </Link>
-          <Link href="/owner/managers" className="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-colors">
-            <Users className="h-6 w-6 mx-auto mb-2" />
-            <span className="text-sm font-medium">Managers</span>
-          </Link>
-          <div className="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-colors cursor-pointer">
-            <FileText className="h-6 w-6 mx-auto mb-2" />
-            <span className="text-sm font-medium">Reports</span>
-          </div>
-          <div className="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-colors cursor-pointer">
-            <Calendar className="h-6 w-6 mx-auto mb-2" />
-            <span className="text-sm font-medium">Schedule</span>
-          </div>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

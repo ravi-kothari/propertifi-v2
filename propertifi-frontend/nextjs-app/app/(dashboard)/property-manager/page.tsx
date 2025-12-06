@@ -1,7 +1,8 @@
 'use client';
 
-import { TrendingUp, Users, Calendar, CheckCircle, Clock, Target } from 'lucide-react';
+import { TrendingUp, Users, Calendar, CheckCircle, Clock, Target, Crown, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 // KPI Card Component
 function KPICard({ title, value, change, icon: Icon, trend = 'up' }: any) {
@@ -53,13 +54,41 @@ function ActivityItem({ title, description, time, type }: any) {
   );
 }
 
+// Tier Badge Component
+function TierBadge({ tier }: { tier?: string }) {
+  const tierConfig: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
+    free: { label: 'Free Tier', icon: Target, color: 'text-gray-700', bgColor: 'bg-gray-100 border-gray-300' },
+    basic: { label: 'Basic', icon: CheckCircle, color: 'text-blue-700', bgColor: 'bg-blue-50 border-blue-300' },
+    pro: { label: 'Pro', icon: Zap, color: 'text-purple-700', bgColor: 'bg-purple-50 border-purple-300' },
+    enterprise: { label: 'Enterprise', icon: Crown, color: 'text-amber-700', bgColor: 'bg-amber-50 border-amber-300' },
+  };
+
+  const config = tierConfig[tier?.toLowerCase() || 'free'] || tierConfig.free;
+  const Icon = config.icon;
+
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold border ${config.color} ${config.bgColor}`}>
+      <Icon className="h-4 w-4" />
+      <span>{config.label}</span>
+    </div>
+  );
+}
+
 export default function PropertyManagerDashboard() {
+  const { user } = useAuth();
+
+  // Mock tier data - in production this would come from API
+  const userTier = 'free'; // This should be fetched from user profile/subscription
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back!</h1>
-        <p className="text-gray-600 mt-1">Here's what's happening with your properties today.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome back{user?.name ? `, ${user.name}` : ''}!</h1>
+          <p className="text-gray-600 mt-1">Here's what's happening with your properties today.</p>
+        </div>
+        <TierBadge tier={userTier} />
       </div>
 
       {/* KPI Grid */}

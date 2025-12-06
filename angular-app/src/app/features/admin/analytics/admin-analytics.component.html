@@ -1,0 +1,60 @@
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-gray-900">Analytics Overview</h1>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <app-ui-card>
+            <div class="p-6">
+                <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                <div class="mt-2 text-3xl font-bold text-gray-900">{{ analytics?.revenue?.total | currency }}</div>
+                <div class="mt-2 text-sm text-green-600 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    {{ analytics?.revenue?.growth }}%
+                </div>
+            </div>
+        </app-ui-card>
+
+        <app-ui-card>
+            <div class="p-6">
+                <p class="text-sm font-medium text-gray-500">Total Users</p>
+                <div class="mt-2 text-3xl font-bold text-gray-900">{{ analytics?.users?.total }}</div>
+                <div class="mt-2 text-sm text-green-600 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    {{ analytics?.users?.growth }}%
+                </div>
+            </div>
+        </app-ui-card>
+
+        <app-ui-card>
+            <div class="p-6">
+                <p class="text-sm font-medium text-gray-500">Active Leads</p>
+                <div class="mt-2 text-3xl font-bold text-gray-900">{{ analytics?.leads?.total }}</div>
+                <div class="mt-2 text-sm text-gray-500">
+                    Conversion Rate: {{ analytics?.leads?.conversion_rate }}%
+                </div>
+            </div>
+        </app-ui-card>
+    </div>
+
+    <!-- Charts Placeholder (Future Implementation) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <app-ui-card>
+            <div class="p-6 h-80 flex items-center justify-center bg-gray-50 rounded-lg">
+                <p class="text-gray-500">Revenue Chart Placeholder</p>
+            </div>
+        </app-ui-card>
+        <app-ui-card>
+            <div class="p-6 h-80 flex items-center justify-center bg-gray-50 rounded-lg">
+                <p class="text-gray-500">User Growth Chart Placeholder</p>
+            </div>
+        </app-ui-card>
+    </div>
+</div>

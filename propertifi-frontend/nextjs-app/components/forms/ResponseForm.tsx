@@ -74,10 +74,10 @@ export default function ResponseForm({ lead, onSubmit, onCancel }: ResponseFormP
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
-    resolver: zodResolver(getSchema()),
+  } = useForm<any>({
+    resolver: zodResolver(getSchema()) as any,
     defaultValues: {
-      response_type: 'contact_info',
+      response_type: 'contact_info' as const,
       message: '',
     },
   });

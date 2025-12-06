@@ -145,7 +145,7 @@ export default function ResponseHistory({ leadId }: ResponseHistoryProps) {
                     <div className="mt-2">
                       <p className="text-xs font-medium text-gray-700 mb-1">Includes:</p>
                       <div className="flex flex-wrap gap-1">
-                        {response.price_quote.includes.map((item, index) => (
+                        {response.price_quote.includes.map((item: string, index: number) => (
                           <span
                             key={index}
                             className="inline-block px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-800"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Bell, X, Check, TrendingUp } from 'lucide-react';
+import { Bell, X, Check, TrendingUp, MapPin, Building2, CheckCheck } from 'lucide-react';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,22 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRouter } from 'next/navigation';
 
 export function NotificationBell() {
-  const { notifications, unreadCount, markAsRead, clearAll, isConnected } = useWebSocket();
+  const {
+    notifications,
+    dbNotifications,
+    unreadCount,
+    markAsRead,
+    markDbNotificationAsRead,
+    markAllDbNotificationsAsRead,
+    clearAll,
+    isConnected,
+    refreshNotifications,
+  } = useWebSocket();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   const getScoreBadgeColor = (tier: string) => {
     switch (tier) {
@@ -54,7 +66,7 @@ export function NotificationBell() {
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-lg">Notifications</h3>
             {isConnected && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="default" className="text-xs">
                 <span className="h-2 w-2 rounded-full bg-green-500 mr-1" />
                 Live
               </Badge>
@@ -73,7 +85,7 @@ export function NotificationBell() {
         </div>
 
         <ScrollArea className="h-[400px]">
-          {notifications.length === 0 ? (
+          {dbNotifications.length === 0 && notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Bell className="h-12 w-12 text-gray-300 mb-3" />
               <p className="text-gray-500 text-sm">No new notifications</p>
@@ -83,13 +95,88 @@ export function NotificationBell() {
             </div>
           ) : (
             <div className="divide-y">
+              {/* Database notifications (persistent) */}
+              {dbNotifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer relative ${
+                    !notification.read_at ? 'bg-indigo-50/50' : ''
+                  }`}
+                  onClick={async () => {
+                    if (!notification.read_at) {
+                      await markDbNotificationAsRead(notification.id);
+                    }
+                    router.push(`/property-manager/leads?lead=${notification.data.lead_id}`);
+                    setIsOpen(false);
+                  }}
+                >
+                  {/* Unread indicator */}
+                  {!notification.read_at && (
+                    <div className="absolute top-4 right-4">
+                      <span className="h-2 w-2 rounded-full bg-indigo-600 block" />
+                    </div>
+                  )}
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white">
+                      <span className="text-xs font-bold">{Math.round(notification.data.match_score)}</span>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-gray-900 mb-1">
+                        {notification.data.title}
+                      </p>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {notification.data.message}
+                      </p>
+
+                      {/* Lead details */}
+                      <div className="space-y-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-3 w-3" />
+                          <span className="capitalize">{notification.data.property_type?.replace('_', ' ')}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-3 w-3" />
+                          <span>{notification.data.location}</span>
+                          {notification.data.distance_miles && (
+                            <span className="text-gray-400">
+                              ({notification.data.distance_miles.toFixed(1)} mi)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Match Score Badge */}
+                      <div className="mt-2 flex items-center gap-2">
+                        <Badge className="text-xs bg-indigo-100 text-indigo-700">
+                          {notification.data.match_score}% Match
+                        </Badge>
+                        {notification.read_at && (
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Read
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Timestamp */}
+                      <p className="text-xs text-gray-400 mt-2">
+                        {new Date(notification.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Real-time WebSocket notifications */}
               {notifications.map((notification, index) => (
                 <div
-                  key={index}
-                  className="p-4 hover:bg-gray-50 transition-colors cursor-pointer relative"
+                  key={`ws-${index}`}
+                  className="p-4 hover:bg-gray-50 transition-colors cursor-pointer relative bg-green-50/50"
                   onClick={() => {
                     markAsRead(index);
-                    // Could navigate to the lead detail page here
+                    router.push('/property-manager/leads');
+                    setIsOpen(false);
                   }}
                 >
                   {/* High-value indicator */}
@@ -105,9 +192,14 @@ export function NotificationBell() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-gray-900 mb-1">
-                        {notification.notification.title}
-                      </p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold text-sm text-gray-900">
+                          {notification.notification.title}
+                        </p>
+                        <Badge variant="default" className="text-xs bg-green-100 text-green-700">
+                          Live
+                        </Badge>
+                      </div>
                       <p className="text-sm text-gray-600 mb-2">
                         {notification.notification.message}
                       </p>
@@ -149,15 +241,29 @@ export function NotificationBell() {
           )}
         </ScrollArea>
 
-        {notifications.length > 0 && (
-          <div className="p-3 border-t bg-gray-50">
+        {(notifications.length > 0 || dbNotifications.length > 0) && (
+          <div className="p-3 border-t bg-gray-50 space-y-2">
+            {unreadCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs"
+                onClick={async () => {
+                  await markAllDbNotificationsAsRead();
+                  clearAll();
+                }}
+              >
+                <CheckCheck className="h-3 w-3 mr-2" />
+                Mark all as read
+              </Button>
+            )}
             <Button
               variant="link"
               size="sm"
               className="w-full text-xs text-indigo-600"
               onClick={() => {
-                // Navigate to leads page
-                window.location.href = '/property-manager';
+                router.push('/property-manager/leads');
+                setIsOpen(false);
               }}
             >
               View all leads →

@@ -15,8 +15,9 @@ class SavedCalculation extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'owner_id',
+        'user_id',
         'calculator_type',
+        'name',
         'input_data',
         'result_data',
     ];
@@ -32,10 +33,10 @@ class SavedCalculation extends Model
     ];
 
     /**
-     * Get the owner that owns the saved calculation.
+     * Get the user that owns the saved calculation.
      */
-    public function owner()
+    public function user()
     {
-        return $this->belongsTo(Owner::class);
+        return $this->belongsTo(User::class);
     }
 }

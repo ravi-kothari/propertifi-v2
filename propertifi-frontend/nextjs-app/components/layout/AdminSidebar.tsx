@@ -12,6 +12,7 @@ import {
   Settings,
   Building2,
   UserCog,
+  GitBranch,
 } from 'lucide-react';
 
 interface NavItem {
@@ -51,6 +52,11 @@ const navItems: NavItem[] = [
     title: 'Leads',
     href: '/admin/leads',
     icon: FileText,
+  },
+  {
+    title: 'Lead Assignments',
+    href: '/admin/lead-assignments',
+    icon: GitBranch,
   },
   {
     title: 'Settings',

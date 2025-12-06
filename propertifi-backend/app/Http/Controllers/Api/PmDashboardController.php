@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\UserLeads;
 use App\Models\LeadResponse;
+use App\Models\LeadAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -133,6 +134,85 @@ class PmDashboardController extends Controller
         return response()->json([
             'success' => true,
             'data' => $stats,
+        ]);
+    }
+
+    /**
+     * Get all available leads for the authenticated PM
+     * Filters by available_at to implement tiered lead access
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getLeads(Request $request)
+    {
+        $pm = Auth::user();
+
+        // Get lead assignments where available_at has passed (tiered access)
+        $query = LeadAssignment::with(['lead', 'manager'])
+            ->where('manager_id', $pm->id)
+            ->where(function ($q) {
+                $q->whereNull('available_at')
+                  ->orWhere('available_at', '<=', now());
+            });
+
+        // Apply status filter if provided
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Apply sorting
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        if ($sortBy === 'match_score') {
+            $query->orderBy('match_score', $sortOrder);
+        } elseif ($sortBy === 'distance') {
+            $query->orderBy('distance_miles', $sortOrder);
+        } else {
+            $query->orderBy('lead_assignments.created_at', $sortOrder);
+        }
+
+        $perPage = $request->input('per_page', 20);
+        $assignments = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $assignments->map(function ($assignment) {
+                return [
+                    'assignment_id' => $assignment->id,
+                    'lead_id' => $assignment->lead_id,
+                    'match_score' => $assignment->match_score,
+                    'distance_miles' => $assignment->distance_miles,
+                    'status' => $assignment->status,
+                    'available_at' => $assignment->available_at,
+                    'contacted_at' => $assignment->contacted_at,
+                    'responded_at' => $assignment->responded_at,
+                    'created_at' => $assignment->created_at,
+                    'lead' => $assignment->lead ? [
+                        'id' => $assignment->lead->id,
+                        'name' => $assignment->lead->name,
+                        'email' => $assignment->lead->email,
+                        'phone' => $assignment->lead->phone,
+                        'address' => $assignment->lead->address,
+                        'city' => $assignment->lead->city,
+                        'state' => $assignment->lead->state,
+                        'zipcode' => $assignment->lead->zipcode,
+                        'property_type' => $assignment->lead->property_type,
+                        'number_of_units' => $assignment->lead->number_of_units,
+                        'square_footage' => $assignment->lead->square_footage,
+                        'additional_services' => $assignment->lead->additional_services,
+                        'status' => $assignment->lead->status,
+                        'created_at' => $assignment->lead->created_at,
+                    ] : null,
+                ];
+            }),
+            'pagination' => [
+                'current_page' => $assignments->currentPage(),
+                'per_page' => $assignments->perPage(),
+                'total' => $assignments->total(),
+                'last_page' => $assignments->lastPage(),
+            ],
         ]);
     }
 }

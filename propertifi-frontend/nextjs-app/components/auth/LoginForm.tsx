@@ -38,10 +38,29 @@ export function LoginForm() {
       await login(values.email, values.password);
       console.log('[LoginForm] Login successful, preparing redirect');
 
-      // Redirect to return URL or default to dashboard
-      const returnUrl = searchParams.get('returnUrl') || '/property-manager';
-      console.log('[LoginForm] Redirecting to:', returnUrl);
-      router.push(returnUrl);
+      // Determine redirect based on returnUrl, URL param, or actual user type
+      const urlUserType = searchParams.get('type');
+      const returnUrl = searchParams.get('returnUrl');
+
+      let redirectUrl = '/owner'; // Default to owner dashboard
+
+      if (returnUrl) {
+        redirectUrl = returnUrl;
+      } else if (urlUserType === 'manager') {
+        redirectUrl = '/property-manager';
+      } else {
+        // Check actual user type from auth state
+        const userState = useAuth.getState();
+        const actualUserType = userState.user?.type;
+        console.log('[LoginForm] User type from state:', actualUserType);
+
+        if (actualUserType === 'AccountManager') {
+          redirectUrl = '/property-manager';
+        }
+      }
+
+      console.log('[LoginForm] Redirecting to:', redirectUrl);
+      router.push(redirectUrl);
     } catch (error) {
       if (error instanceof ValidationError) {
         // Handle field-level validation errors from API

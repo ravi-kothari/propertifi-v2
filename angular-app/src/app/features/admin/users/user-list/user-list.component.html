@@ -1,0 +1,63 @@
+<app-ui-card title="Users" [padding]="'p-0'">
+    <div *ngIf="users$ | async as usersResponse; else loading">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Created At</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr *ngFor="let user of usersResponse.data" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div
+                                    class="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold mr-3">
+                                    {{ user.name.charAt(0) }}
+                                </div>
+                                <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">{{ user.email }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <app-ui-badge
+                                [variant]="user.role === 'admin' ? 'error' : (user.role === 'owner' ? 'primary' : 'warning')">
+                                {{ user.role | titlecase }}
+                            </app-ui-badge>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ user.created_at | date:'mediumDate' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end gap-2">
+                                <app-ui-button *ngIf="!user.email_verified_at" (onClick)="onVerify(user.id)"
+                                    variant="secondary" size="sm">
+                                    Verify
+                                </app-ui-button>
+                                <app-ui-button (onClick)="onAssignRole(user.id, 'admin')" variant="ghost" size="sm">
+                                    Make Admin
+                                </app-ui-button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <ng-template #loading>
+        <div class="p-6 flex justify-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        </div>
+    </ng-template>
+</app-ui-card>

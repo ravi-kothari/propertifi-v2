@@ -1,0 +1,120 @@
+<div class="bg-white">
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl font-heading">
+                ROI Calculator
+            </h1>
+            <p class="mt-4 text-lg text-gray-500">
+                Analyze your property investment potential.
+            </p>
+        </div>
+
+        <div class="lg:grid lg:grid-cols-2 lg:gap-8">
+            <!-- Input Form -->
+            <div class="bg-surface-50 p-6 rounded-lg shadow-sm">
+                <h2 class="text-lg font-medium text-gray-900 mb-6">Property Details</h2>
+                <form [formGroup]="roiForm" (ngSubmit)="calculate()" class="space-y-6">
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div>
+                            <label for="purchasePrice" class="block text-sm font-medium text-gray-700">Purchase Price
+                                ($)</label>
+                            <input type="number" formControlName="purchasePrice" id="purchasePrice"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="downPayment" class="block text-sm font-medium text-gray-700">Down Payment
+                                ($)</label>
+                            <input type="number" formControlName="downPayment" id="downPayment"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="interestRate" class="block text-sm font-medium text-gray-700">Interest Rate
+                                (%)</label>
+                            <input type="number" formControlName="interestRate" id="interestRate" step="0.1"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="loanTerm" class="block text-sm font-medium text-gray-700">Loan Term
+                                (Years)</label>
+                            <input type="number" formControlName="loanTerm" id="loanTerm"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="monthlyRent" class="block text-sm font-medium text-gray-700">Monthly Rent
+                                ($)</label>
+                            <input type="number" formControlName="monthlyRent" id="monthlyRent"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="propertyTax" class="block text-sm font-medium text-gray-700">Annual Property Tax
+                                ($)</label>
+                            <input type="number" formControlName="propertyTax" id="propertyTax"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="insurance" class="block text-sm font-medium text-gray-700">Annual Insurance
+                                ($)</label>
+                            <input type="number" formControlName="insurance" id="insurance"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="maintenance" class="block text-sm font-medium text-gray-700">Annual Maintenance
+                                ($)</label>
+                            <input type="number" formControlName="maintenance" id="maintenance"
+                                class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <app-ui-button type="submit" variant="primary" [loading]="loading" [disabled]="roiForm.invalid"
+                        class="w-full">
+                        Calculate ROI
+                    </app-ui-button>
+                </form>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-8 lg:mt-0 bg-white p-6 rounded-lg shadow-lg border border-gray-100">
+                <h2 class="text-lg font-medium text-gray-900 mb-6">Investment Analysis</h2>
+
+                <div *ngIf="!result && !loading" class="text-center py-12 text-gray-500">
+                    Enter property details to see the analysis.
+                </div>
+
+                <div *ngIf="result" class="space-y-8">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-surface-50 p-4 rounded-lg text-center">
+                            <dt class="text-sm font-medium text-gray-500 truncate">Cash on Cash ROI</dt>
+                            <dd class="mt-1 text-3xl font-semibold text-primary">{{ result.cashOnCashRoi |
+                                number:'1.2-2' }}%</dd>
+                        </div>
+                        <div class="bg-surface-50 p-4 rounded-lg text-center">
+                            <dt class="text-sm font-medium text-gray-500 truncate">Cap Rate</dt>
+                            <dd class="mt-1 text-3xl font-semibold text-secondary">{{ result.capRate | number:'1.2-2'
+                                }}%</dd>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6">
+                        <dl class="space-y-4">
+                            <div class="flex justify-between">
+                                <dt class="text-sm text-gray-500">Monthly Income</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ result.monthlyIncome | currency }}</dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm text-gray-500">Monthly Expenses</dt>
+                                <dd class="text-sm font-medium text-error">{{ result.monthlyExpenses | currency }}</dd>
+                            </div>
+                            <div class="flex justify-between border-t border-gray-100 pt-4">
+                                <dt class="text-base font-medium text-gray-900">Monthly Cash Flow</dt>
+                                <dd class="text-base font-bold" [class.text-success]="result.cashFlow > 0"
+                                    [class.text-error]="result.cashFlow < 0">
+                                    {{ result.cashFlow | currency }}
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,16 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { initializeEcho, getEcho, disconnectEcho } from '@/lib/echo';
 import { useToast } from '@/components/ui/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  getNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  deleteNotification,
+  type Notification as DbNotification,
+} from '@/lib/notifications-api';
 
 interface LeadNotification {
   lead: {
@@ -39,17 +46,25 @@ interface LeadNotification {
 interface WebSocketContextType {
   isConnected: boolean;
   notifications: LeadNotification[];
+  dbNotifications: DbNotification[];
   unreadCount: number;
   markAsRead: (notificationId: number) => void;
+  markDbNotificationAsRead: (id: string) => Promise<void>;
+  markAllDbNotificationsAsRead: () => Promise<void>;
   clearAll: () => void;
+  refreshNotifications: () => Promise<void>;
 }
 
 const WebSocketContext = createContext<WebSocketContextType>({
   isConnected: false,
   notifications: [],
+  dbNotifications: [],
   unreadCount: 0,
   markAsRead: () => {},
+  markDbNotificationAsRead: async () => {},
+  markAllDbNotificationsAsRead: async () => {},
   clearAll: () => {},
+  refreshNotifications: async () => {},
 });
 
 export function useWebSocket() {
@@ -64,9 +79,55 @@ interface WebSocketProviderProps {
 export function WebSocketProvider({ children, userId }: WebSocketProviderProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState<LeadNotification[]>([]);
+  const [dbNotifications, setDbNotifications] = useState<DbNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch database notifications
+  const refreshNotifications = useCallback(async () => {
+    try {
+      const response = await getNotifications({ per_page: 50 });
+      setDbNotifications(response.data);
+      setUnreadCount(response.meta.unread_count);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    }
+  }, []);
+
+  // Mark database notification as read
+  const markDbNotificationAsRead = useCallback(async (id: string) => {
+    try {
+      await markNotificationAsRead(id);
+      setDbNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  }, []);
+
+  // Mark all database notifications as read
+  const markAllDbNotificationsAsRead = useCallback(async () => {
+    try {
+      await markAllNotificationsAsRead();
+      setDbNotifications((prev) =>
+        prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+      );
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
+  }, []);
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token && userId) {
+      refreshNotifications();
+    }
+  }, [userId, refreshNotifications]);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -162,9 +223,13 @@ export function WebSocketProvider({ children, userId }: WebSocketProviderProps) 
   const value: WebSocketContextType = {
     isConnected,
     notifications,
+    dbNotifications,
     unreadCount,
     markAsRead,
+    markDbNotificationAsRead,
+    markAllDbNotificationsAsRead,
     clearAll,
+    refreshNotifications,
   };
 
   return (

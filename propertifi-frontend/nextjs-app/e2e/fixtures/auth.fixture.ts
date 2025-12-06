@@ -53,7 +53,7 @@ export const test = base.extend<AuthFixtures>({
     }
 
     // Use the login helper
-    await login(page, testUser.email, testUser.password, testUser.role || 'property_manager');
+    await login(page, testUser.email, testUser.password, (testUser.role === 'admin' ? 'property_manager' : testUser.role) || 'property_manager');
 
     // Verify we're logged in (check for dashboard or user menu)
     await expect(page).toHaveURL(/\/property-manager|\/owner\/dashboard|\/dashboard/);
@@ -91,7 +91,7 @@ export async function login(
       // Store token in localStorage
       const token = response.access_token || response.token;
       await page.evaluate(
-        (token) => {
+        (token: string) => {
           localStorage.setItem('auth', JSON.stringify({ token }));
         },
         token
@@ -117,7 +117,7 @@ export async function login(
         if (response.access_token || response.token) {
           const token = response.access_token || response.token;
           await page.evaluate(
-            (token) => {
+            (token: string) => {
               localStorage.setItem('auth', JSON.stringify({ token }));
             },
             token

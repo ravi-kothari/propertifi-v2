@@ -37,7 +37,7 @@ export function CookieConsentBanner() {
           <Link href="/privacy-policy" className="underline">Learn more</Link>.
         </p>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={handleAccept}>Accept</Button>
+          <Button variant="default" onClick={handleAccept}>Accept</Button>
           <Button variant="outline" onClick={handleDecline}>Decline</Button>
         </div>
       </div>

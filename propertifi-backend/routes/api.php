@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\OwnerDashboardController;
 use App\Http\Controllers\Api\OwnerBookmarkController;
 use App\Http\Controllers\Api\SavedCalculationController;
 use App\Http\Controllers\Api\PropertyManagerController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\V2;
 use App\Http\Controllers\Admin;
 
@@ -78,6 +79,7 @@ Route::prefix('api')->group(function () {
     // PM Dashboard endpoint
     Route::middleware(['auth:sanctum', 'is_pm'])->group(function () {
         Route::get('/pm/dashboard', [PmDashboardController::class, 'dashboard']);
+        Route::get('/pm/leads', [PmDashboardController::class, 'getLeads']);
         Route::put('/user-leads/{userLead}', [UserLeadController::class, 'updateStatus']);
         Route::put('/user-leads/{userLead}/notes', [UserLeadController::class, 'updateNotes']);
 
@@ -89,6 +91,14 @@ Route::prefix('api')->group(function () {
         Route::get('/v1/leads/scores', [\App\Http\Controllers\Api\V1\LeadScoringController::class, 'getMyLeadScores']);
         Route::get('/v1/leads/{leadId}/score', [\App\Http\Controllers\Api\V1\LeadScoringController::class, 'getLeadScore']);
         Route::get('/v1/market-insights', [\App\Http\Controllers\Api\V1\LeadScoringController::class, 'getMarketInsights']);
+
+        // PM Notifications
+        Route::get('/pm/notifications', [NotificationController::class, 'index']);
+        Route::get('/pm/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('/pm/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/pm/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/pm/notifications/{id}', [NotificationController::class, 'destroy']);
+        Route::delete('/pm/notifications/clear-read', [NotificationController::class, 'clearRead']);
     });
 
     // Owner Authentication endpoints
@@ -99,16 +109,20 @@ Route::prefix('api')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/owner/logout', [OwnerLoginController::class, 'logout']);
         Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index']);
+        Route::get('/owner/leads', [OwnerDashboardController::class, 'leads']);
+        Route::get('/owner/leads/{id}', [OwnerDashboardController::class, 'showLead']);
 
         // Owner Bookmarks
         Route::get('/owner/bookmarks', [OwnerBookmarkController::class, 'index']);
         Route::post('/owner/bookmarks', [OwnerBookmarkController::class, 'store']);
         Route::delete('/owner/bookmarks/{bookmark}', [OwnerBookmarkController::class, 'destroy']);
 
-        // Saved Calculations
-        Route::get('/owner/calculations', [SavedCalculationController::class, 'index']);
-        Route::post('/owner/calculations', [SavedCalculationController::class, 'store']);
-        Route::delete('/owner/calculations/{calculation}', [SavedCalculationController::class, 'destroy']);
+        // Saved Calculations (accessible by all authenticated users)
+        Route::get('/saved-calculations', [SavedCalculationController::class, 'index']);
+        Route::post('/saved-calculations', [SavedCalculationController::class, 'store']);
+        Route::get('/saved-calculations/{savedCalculation}', [SavedCalculationController::class, 'show']);
+        Route::put('/saved-calculations/{savedCalculation}', [SavedCalculationController::class, 'update']);
+        Route::delete('/saved-calculations/{savedCalculation}', [SavedCalculationController::class, 'destroy']);
     });
 
     // API V2 Routes

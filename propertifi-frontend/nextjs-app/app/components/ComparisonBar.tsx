@@ -6,12 +6,14 @@ import { X, Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function ComparisonBar() {
-  const { comparisonList, removeFromComparison, clearComparison } = useComparison();
+  const comparison = useComparison();
   const router = useRouter();
 
-  if (comparisonList.length === 0) {
+  if (!comparison || comparison.comparisonList.length === 0) {
     return null;
   }
+
+  const { comparisonList, removeFromComparison, clearComparison } = comparison;
 
   const handleCompare = () => {
     router.push("/compare");

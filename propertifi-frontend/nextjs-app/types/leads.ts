@@ -34,6 +34,20 @@ export interface Lead {
   updated_at: string;
 }
 
+/**
+ * Lead with assignment information for property managers
+ * Includes match score, distance, and tiered access data
+ */
+export interface LeadWithAssignment extends Lead {
+  assignment_id: number;
+  match_score: number;
+  distance_miles: number | null;
+  assignment_status: string;
+  available_at: string | null;
+  contacted_at: string | null;
+  responded_at: string | null;
+}
+
 export interface ContactInfo {
   phone?: string;
   email?: string;

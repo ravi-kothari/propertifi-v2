@@ -1,6 +1,6 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ResponseForm } from "./responses/ResponseForm";
+import ResponseForm from "@/components/leads/ResponseForm";
 
 export function LeadDetail({ lead }: { lead: any }) {
   return (

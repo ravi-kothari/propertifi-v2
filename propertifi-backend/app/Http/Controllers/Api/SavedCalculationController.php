@@ -10,49 +10,121 @@ use Illuminate\Support\Facades\Auth;
 class SavedCalculationController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Get all saved calculations for the authenticated user
      */
-    public function index()
+    public function index(Request $request)
     {
-        $calculations = Auth::user()->savedCalculations;
-        return response()->json($calculations);
+        $query = SavedCalculation::where('user_id', Auth::id());
+
+        // Filter by calculator type if provided
+        if ($request->has('calculator_type')) {
+            $query->where('calculator_type', $request->calculator_type);
+        }
+
+        $calculations = $query->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'calculations' => $calculations
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Get a specific saved calculation
+     */
+    public function show(SavedCalculation $savedCalculation)
+    {
+        // Ensure user owns this calculation
+        if ($savedCalculation->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json([
+            'calculation' => $savedCalculation
+        ]);
+    }
+
+    /**
+     * Save a new calculation
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'calculator_type' => 'required|string|in:roi,mortgage,rent_vs_buy',
+        $validated = $request->validate([
+            'calculator_type' => 'required|string|in:roi,pm-fee,rent-estimate,rehab-cost',
+            'name' => 'nullable|string|max:255',
             'input_data' => 'required|array',
-            'result_data' => 'required|array',
+            'result_data' => 'nullable|array',
         ]);
 
-        $calculation = Auth::user()->savedCalculations()->create($request->all());
+        $calculation = SavedCalculation::create([
+            'user_id' => Auth::id(),
+            'calculator_type' => $validated['calculator_type'],
+            'name' => $validated['name'] ?? $this->generateDefaultName($validated['calculator_type']),
+            'input_data' => $validated['input_data'],
+            'result_data' => $validated['result_data'] ?? null,
+        ]);
 
-        return response()->json($calculation, 201);
+        return response()->json([
+            'message' => 'Calculation saved successfully',
+            'calculation' => $calculation
+        ], 201);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\SavedCalculation  $savedCalculation
-     * @return \Illuminate\Http\Response
+     * Update a saved calculation
+     */
+    public function update(Request $request, SavedCalculation $savedCalculation)
+    {
+        // Ensure user owns this calculation
+        if ($savedCalculation->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'input_data' => 'nullable|array',
+            'result_data' => 'nullable|array',
+        ]);
+
+        $savedCalculation->update($validated);
+
+        return response()->json([
+            'message' => 'Calculation updated successfully',
+            'calculation' => $savedCalculation
+        ]);
+    }
+
+    /**
+     * Delete a saved calculation
      */
     public function destroy(SavedCalculation $savedCalculation)
     {
-        if ($savedCalculation->owner_id !== Auth::id()) {
+        // Ensure user owns this calculation
+        if ($savedCalculation->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $savedCalculation->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Calculation deleted successfully'
+        ]);
+    }
+
+    /**
+     * Generate a default name for a calculation
+     */
+    private function generateDefaultName($calculatorType)
+    {
+        $names = [
+            'roi' => 'ROI Analysis',
+            'pm-fee' => 'PM Fee Estimate',
+            'rent-estimate' => 'Rent Estimate',
+            'rehab-cost' => 'Rehab Cost Estimate',
+        ];
+
+        $baseName = $names[$calculatorType] ?? 'Calculation';
+        $date = now()->format('M d, Y');
+
+        return "{$baseName} - {$date}";
     }
 }

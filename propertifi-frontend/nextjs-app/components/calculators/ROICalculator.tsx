@@ -12,7 +12,7 @@ export default function ROICalculator() {
     monthlyExpenses: 0,
   });
 
-  const handleFormChange = (e) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,

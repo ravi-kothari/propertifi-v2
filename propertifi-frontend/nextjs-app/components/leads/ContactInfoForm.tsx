@@ -30,9 +30,9 @@ export default function ContactInfoForm({ form }: ContactInfoFormProps) {
             placeholder="(555) 123-4567"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
-          {errors.contact_info?.phone && (
+          {(errors.contact_info as any)?.phone && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.contact_info.phone.message as string}
+              {(errors.contact_info as any).phone.message as string}
             </p>
           )}
         </div>
@@ -49,9 +49,9 @@ export default function ContactInfoForm({ form }: ContactInfoFormProps) {
             placeholder="pm@example.com"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
-          {errors.contact_info?.email && (
+          {(errors.contact_info as any)?.email && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.contact_info.email.message as string}
+              {(errors.contact_info as any).email.message as string}
             </p>
           )}
         </div>
@@ -73,9 +73,9 @@ export default function ContactInfoForm({ form }: ContactInfoFormProps) {
           <option value="evening">Evening (5pm - 8pm)</option>
           <option value="anytime">Anytime</option>
         </select>
-        {errors.contact_info?.preferred_time && (
+        {(errors.contact_info as any)?.preferred_time && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.contact_info.preferred_time.message as string}
+            {(errors.contact_info as any).preferred_time.message as string}
           </p>
         )}
       </div>
@@ -92,9 +92,9 @@ export default function ContactInfoForm({ form }: ContactInfoFormProps) {
           placeholder="Any additional information you'd like to share..."
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         />
-        {errors.contact_info?.notes && (
+        {(errors.contact_info as any)?.notes && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.contact_info.notes.message as string}
+            {(errors.contact_info as any).notes.message as string}
           </p>
         )}
       </div>

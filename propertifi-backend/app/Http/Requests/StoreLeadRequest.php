@@ -44,7 +44,7 @@ class StoreLeadRequest extends FormRequest
             // Contact information
             'full_name' => 'required|string|max:100',
             'email' => 'required|email|max:255',
-            'phone' => 'required|string|regex:/^[0-9]{10}$/', // 10-digit phone
+            'phone' => 'nullable|string|regex:/^[0-9]{10}$/', // 10-digit phone (now optional)
             'preferred_contact' => 'required|string|in:email,phone',
 
             // Optional source tracking
@@ -77,8 +77,7 @@ class StoreLeadRequest extends FormRequest
             'full_name.required' => 'Full name is required.',
             'email.required' => 'Email address is required.',
             'email.email' => 'Please enter a valid email address.',
-            'phone.required' => 'Phone number is required.',
-            'phone.regex' => 'Phone number must be 10 digits.',
+            'phone.regex' => 'Phone number must be 10 digits (if provided).',
             'preferred_contact.required' => 'Please select a preferred contact method.',
             'preferred_contact.in' => 'Invalid contact method selected.'
         ];

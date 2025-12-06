@@ -41,7 +41,15 @@ export default function ProfileTab({ data, onSave, isSaving }: ProfileTabProps) 
   });
 
   const onSubmit = (formData: ProfileFormData) => {
-    onSave({ profile: formData });
+    onSave({
+      profile: {
+        name: formData.name,
+        email: data?.profile.email || '',
+        phone: formData.phone || '',
+        company_name: formData.company_name || '',
+        bio: formData.bio || '',
+      }
+    });
   };
 
   return (

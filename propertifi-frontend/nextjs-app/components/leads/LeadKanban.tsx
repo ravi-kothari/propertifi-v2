@@ -26,9 +26,9 @@ const stages: Stage[] = [
   { id: 'approved', name: 'Approved', color: 'bg-emerald-100 text-emerald-700 border-emerald-200', count: 0 },
 ];
 
-interface LeadKanbanProps {
-  leads: Lead[];
-  onLeadClick: (lead: Lead) => void;
+interface LeadKanbanProps<T extends Lead = Lead> {
+  leads: T[];
+  onLeadClick: (lead: T) => void;
 }
 
 function KanbanCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
@@ -69,8 +69,8 @@ function KanbanCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
       <div className="flex items-start gap-2 mb-2">
         <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
         <div className="text-sm text-gray-700">
-          <p>{lead.street_address || lead.address}</p>
-          <p>{lead.city}, {lead.state} {lead.zip_code || lead.zipcode}</p>
+          <p>{lead.street_address}</p>
+          <p>{lead.city}, {lead.state} {lead.zip_code}</p>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ function KanbanCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
       <div className="border-t border-gray-100 mt-3 pt-3">
         <div className="flex items-center gap-2 text-sm text-gray-700">
           <UsersIcon className="h-4 w-4 text-gray-400" />
-          <span className="font-medium">{lead.full_name || lead.name}</span>
+          <span className="font-medium">{lead.full_name}</span>
         </div>
         {lead.email && (
           <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
@@ -103,18 +103,18 @@ function KanbanCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
       </div>
 
       {/* AI Score Badge (if available) */}
-      {lead.ai_score && (
+      {(lead as any).ai_score && (
         <div className="mt-3">
           <Badge
             className={`text-xs ${
-              lead.ai_score >= 80
+              (lead as any).ai_score >= 80
                 ? 'bg-red-100 text-red-700'
-                : lead.ai_score >= 65
+                : (lead as any).ai_score >= 65
                 ? 'bg-green-100 text-green-700'
                 : 'bg-blue-100 text-blue-700'
             }`}
           >
-            AI Score: {lead.ai_score}/100
+            AI Score: {(lead as any).ai_score}/100
           </Badge>
         </div>
       )}
@@ -122,7 +122,7 @@ function KanbanCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
   );
 }
 
-export function LeadKanban({ leads, onLeadClick }: LeadKanbanProps) {
+export function LeadKanban<T extends Lead = Lead>({ leads, onLeadClick }: LeadKanbanProps<T>) {
   // Group leads by stage
   const leadsByStage = stages.reduce((acc, stage) => {
     acc[stage.id] = leads.filter((lead) => {
@@ -152,7 +152,7 @@ export function LeadKanban({ leads, onLeadClick }: LeadKanbanProps) {
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-gray-900">{stage.name}</h3>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="default" className="text-xs">
                   {stageLeads.length}
                 </Badge>
               </div>
@@ -175,7 +175,7 @@ export function LeadKanban({ leads, onLeadClick }: LeadKanbanProps) {
                   <KanbanCard
                     key={lead.id}
                     lead={lead}
-                    onClick={() => onLeadClick(lead)}
+                    onClick={() => onLeadClick(lead as T)}
                   />
                 ))
               )}

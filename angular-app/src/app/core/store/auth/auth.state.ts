@@ -1,4 +1,4 @@
-import { User } from '../../models/user.model';
+import { User, UserType } from '../../models/user.model';
 
 /**
  * Authentication State Interface
@@ -62,5 +62,5 @@ export const initialAuthState: AuthState = {
   error: null,
 };
 
-// Re-export User type for convenience when importing from auth state
-export type { User };
+// Re-export User and UserType types for convenience when importing from auth state
+export type { User, UserType };

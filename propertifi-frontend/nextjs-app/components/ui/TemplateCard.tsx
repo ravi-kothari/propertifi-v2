@@ -4,7 +4,7 @@ import DownloadButton from './DownloadButton';
 
 const TemplatePreview = dynamic(() => import('./TemplatePreview'));
 
-const Modal = ({ children, onClose }) => (
+const Modal = ({ children, onClose }: { children: React.ReactNode; onClose: () => void }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <button onClick={onClose} className="absolute top-4 right-4">Close</button>
@@ -13,7 +13,12 @@ const Modal = ({ children, onClose }) => (
   </div>
 );
 
-export default function TemplateCard({ template, onDownload }) {
+interface TemplateCardProps {
+  template: any;
+  onDownload: (template: any) => void;
+}
+
+export default function TemplateCard({ template, onDownload }: TemplateCardProps) {
   const [showPreview, setShowPreview] = useState(false);
 
   return (

@@ -6,9 +6,9 @@ if (typeof window !== 'undefined') {
   (window as any).Pusher = Pusher;
 }
 
-let echoInstance: Echo | null = null;
+let echoInstance: Echo<any> | null = null;
 
-export function initializeEcho(token: string | null): Echo | null {
+export function initializeEcho(token: string | null): Echo<any> | null {
   if (typeof window === 'undefined') {
     return null; // Server-side, don't initialize
   }
@@ -53,7 +53,7 @@ export function initializeEcho(token: string | null): Echo | null {
   return echoInstance;
 }
 
-export function getEcho(): Echo | null {
+export function getEcho(): Echo<any> | null {
   return echoInstance;
 }
 

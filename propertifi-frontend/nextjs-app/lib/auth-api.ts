@@ -39,3 +39,32 @@ export const refreshToken = async (): Promise<AuthResponse> => {
   const response = await apiClient.post<AuthResponse>(`${AUTH_BASE_PATH}/refresh`);
   return response.data;
 };
+
+export const forgotPassword = async (email: string): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>(`${AUTH_BASE_PATH}/forgot-password`, { email });
+  return response.data;
+};
+
+export const resetPassword = async (data: {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>(`${AUTH_BASE_PATH}/reset-password`, data);
+  return response.data;
+};
+
+export const verifyEmail = async (id: number, hash: string): Promise<{ message: string }> => {
+  const response = await apiClient.get<{ message: string }>(`${AUTH_BASE_PATH}/verify-email/${id}/${hash}`);
+  return response.data;
+};
+
+export const resendVerification = async (token: string): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>(`${AUTH_BASE_PATH}/resend-verification`, null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

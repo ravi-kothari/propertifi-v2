@@ -87,7 +87,6 @@ export default function AnalyticsDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             }
-            trend={analytics.performance_metrics.leads_trend}
             color="blue"
           />
 
@@ -100,7 +99,11 @@ export default function AnalyticsDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             }
-            trend={analytics.performance_metrics.conversion_trend}
+            trend={{
+              value: Math.abs(analytics.performance_metrics.week_over_week_change),
+              label: 'vs last week',
+              direction: analytics.performance_metrics.week_over_week_change > 0 ? 'up' : analytics.performance_metrics.week_over_week_change < 0 ? 'down' : 'neutral'
+            }}
             color="green"
           />
 
@@ -113,7 +116,6 @@ export default function AnalyticsDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             }
-            trend={analytics.performance_metrics.response_time_trend}
             color="purple"
           />
 
@@ -150,7 +152,10 @@ export default function AnalyticsDashboard() {
           <BarChartSkeleton height={300} />
         ) : analytics?.leads_by_status ? (
           <BarChart
-            data={analytics.leads_by_status}
+            data={analytics.leads_by_status.map(item => ({
+              label: item.status,
+              value: item.count
+            }))}
             title="Leads by Status"
             height={300}
           />
@@ -164,7 +169,11 @@ export default function AnalyticsDashboard() {
           <DonutChartSkeleton size={300} />
         ) : analytics?.leads_by_source ? (
           <DonutChart
-            data={analytics.leads_by_source}
+            data={analytics.leads_by_source.map(item => ({
+              label: item.source,
+              value: item.count,
+              percentage: item.percentage
+            }))}
             title="Leads by Source"
             size={300}
           />
@@ -173,9 +182,14 @@ export default function AnalyticsDashboard() {
         {/* Response Breakdown */}
         {isLoading ? (
           <DonutChartSkeleton size={300} />
-        ) : analytics?.response_metrics.responses_by_type ? (
+        ) : analytics?.response_metrics ? (
           <DonutChart
-            data={analytics.response_metrics.responses_by_type}
+            data={[
+              { label: 'Contact Info', value: analytics.response_metrics.contact_info_responses, percentage: (analytics.response_metrics.contact_info_responses / analytics.response_metrics.total_responses) * 100 },
+              { label: 'Availability', value: analytics.response_metrics.availability_responses, percentage: (analytics.response_metrics.availability_responses / analytics.response_metrics.total_responses) * 100 },
+              { label: 'Price Quote', value: analytics.response_metrics.price_quote_responses, percentage: (analytics.response_metrics.price_quote_responses / analytics.response_metrics.total_responses) * 100 },
+              { label: 'Declined', value: analytics.response_metrics.decline_responses, percentage: (analytics.response_metrics.decline_responses / analytics.response_metrics.total_responses) * 100 },
+            ].filter(item => item.value > 0)}
             title="Responses by Type"
             size={300}
           />
@@ -200,9 +214,9 @@ export default function AnalyticsDashboard() {
           />
 
           <StatCard
-            title="Email Response Rate"
-            value={`${analytics.response_metrics.email_response_rate.toFixed(1)}%`}
-            subtitle={`${analytics.response_metrics.phone_response_rate.toFixed(1)}% phone rate`}
+            title="Overall Response Rate"
+            value={`${analytics.response_metrics.response_rate.toFixed(1)}%`}
+            subtitle="Of all leads received"
             color="purple"
           />
         </div>
@@ -256,7 +270,7 @@ export default function AnalyticsDashboard() {
                     <h3 className="font-semibold text-gray-900">Lead Volume Trending</h3>
                     <p className="text-sm text-gray-600 mt-1">
                       You've received {analytics.lead_metrics.new_leads} new leads this period.
-                      {analytics.performance_metrics.leads_trend === 'up'
+                      {analytics.performance_metrics.week_over_week_change > 0
                         ? ' This represents positive growth - consider scaling your marketing efforts.'
                         : ' Focus on lead quality and conversion optimization.'}
                     </p>
@@ -305,9 +319,9 @@ export default function AnalyticsDashboard() {
                     <td className="py-3 px-4 text-sm font-medium text-gray-900">Total Leads</td>
                     <td className="py-3 px-4 text-sm text-right text-gray-700">{analytics.lead_metrics.total_leads}</td>
                     <td className="py-3 px-4 text-sm text-right">
-                      <span className={`inline-flex items-center gap-1 ${analytics.performance_metrics.leads_trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                        {analytics.performance_metrics.leads_trend === 'up' ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                        {analytics.performance_metrics.leads_trend}
+                      <span className={`inline-flex items-center gap-1 ${analytics.performance_metrics.week_over_week_change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {analytics.performance_metrics.week_over_week_change > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                        {analytics.performance_metrics.week_over_week_change > 0 ? 'up' : 'down'}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-sm text-right">
@@ -320,9 +334,8 @@ export default function AnalyticsDashboard() {
                     <td className="py-3 px-4 text-sm font-medium text-gray-900">Conversion Rate</td>
                     <td className="py-3 px-4 text-sm text-right text-gray-700">{analytics.lead_metrics.conversion_rate.toFixed(1)}%</td>
                     <td className="py-3 px-4 text-sm text-right">
-                      <span className={`inline-flex items-center gap-1 ${analytics.performance_metrics.conversion_trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                        {analytics.performance_metrics.conversion_trend === 'up' ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                        {analytics.performance_metrics.conversion_trend}
+                      <span className="inline-flex items-center gap-1 text-gray-500">
+                        <span className="text-xs">-</span>
                       </span>
                     </td>
                     <td className="py-3 px-4 text-sm text-right">
@@ -340,9 +353,8 @@ export default function AnalyticsDashboard() {
                     <td className="py-3 px-4 text-sm font-medium text-gray-900">Avg Response Time</td>
                     <td className="py-3 px-4 text-sm text-right text-gray-700">{analytics.lead_metrics.average_response_time.toFixed(1)}h</td>
                     <td className="py-3 px-4 text-sm text-right">
-                      <span className={`inline-flex items-center gap-1 ${analytics.performance_metrics.response_time_trend === 'down' ? 'text-green-600' : 'text-red-600'}`}>
-                        {analytics.performance_metrics.response_time_trend === 'down' ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
-                        {analytics.performance_metrics.response_time_trend}
+                      <span className="inline-flex items-center gap-1 text-gray-500">
+                        <span className="text-xs">-</span>
                       </span>
                     </td>
                     <td className="py-3 px-4 text-sm text-right">

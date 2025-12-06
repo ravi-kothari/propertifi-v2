@@ -1,4 +1,8 @@
-export default function TemplatePreview({ template }) {
+interface TemplatePreviewProps {
+  template: any;
+}
+
+export default function TemplatePreview({ template }: TemplatePreviewProps) {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">{template.name}</h2>

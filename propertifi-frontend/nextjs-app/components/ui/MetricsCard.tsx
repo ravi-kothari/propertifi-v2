@@ -1,6 +1,13 @@
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
 
-export default function MetricsCard({ title, value, comparisonValue, comparisonText }) {
+interface MetricsCardProps {
+  title: string;
+  value: number;
+  comparisonValue: number;
+  comparisonText: string;
+}
+
+export default function MetricsCard({ title, value, comparisonValue, comparisonText }: MetricsCardProps) {
   const isPositive = value >= comparisonValue;
   const percentageChange = Math.abs(((value - comparisonValue) / comparisonValue) * 100).toFixed(1);
 

@@ -1,0 +1,72 @@
+<div class="bg-white">
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl font-heading">
+                Mortgage Calculator
+            </h1>
+            <p class="mt-4 text-lg text-gray-500">
+                Estimate your monthly mortgage payments.
+            </p>
+        </div>
+
+        <div class="lg:grid lg:grid-cols-2 lg:gap-8">
+            <!-- Input Form -->
+            <div class="bg-surface-50 p-6 rounded-lg shadow-sm">
+                <h2 class="text-lg font-medium text-gray-900 mb-6">Loan Details</h2>
+                <form [formGroup]="mortgageForm" (ngSubmit)="calculate()" class="space-y-6">
+                    <div>
+                        <label for="loanAmount" class="block text-sm font-medium text-gray-700">Loan Amount ($)</label>
+                        <input type="number" formControlName="loanAmount" id="loanAmount"
+                            class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="interestRate" class="block text-sm font-medium text-gray-700">Interest Rate
+                            (%)</label>
+                        <input type="number" formControlName="interestRate" id="interestRate" step="0.1"
+                            class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="loanTerm" class="block text-sm font-medium text-gray-700">Loan Term (Years)</label>
+                        <input type="number" formControlName="loanTerm" id="loanTerm"
+                            class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary border-gray-300 rounded-md">
+                    </div>
+
+                    <app-ui-button type="submit" variant="primary" [loading]="loading" [disabled]="mortgageForm.invalid"
+                        class="w-full">
+                        Calculate Payment
+                    </app-ui-button>
+                </form>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-8 lg:mt-0 bg-white p-6 rounded-lg shadow-lg border border-gray-100">
+                <h2 class="text-lg font-medium text-gray-900 mb-6">Payment Summary</h2>
+
+                <div *ngIf="!result && !loading" class="text-center py-12 text-gray-500">
+                    Enter loan details to see the estimate.
+                </div>
+
+                <div *ngIf="result" class="space-y-8">
+                    <div class="bg-primary-light/10 p-6 rounded-lg text-center">
+                        <dt class="text-sm font-medium text-gray-500 truncate">Monthly Payment</dt>
+                        <dd class="mt-2 text-4xl font-extrabold text-primary">{{ result.monthlyPayment | currency }}
+                        </dd>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6">
+                        <dl class="space-y-4">
+                            <div class="flex justify-between">
+                                <dt class="text-sm text-gray-500">Total Payment (Principal + Interest)</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ result.totalPayment | currency }}</dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm text-gray-500">Total Interest Paid</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ result.totalInterest | currency }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

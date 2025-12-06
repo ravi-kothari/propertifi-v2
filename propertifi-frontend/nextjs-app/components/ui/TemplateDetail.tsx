@@ -1,4 +1,8 @@
-export default function TemplateDetail({ template }) {
+interface TemplateDetailProps {
+  template: any;
+}
+
+export default function TemplateDetail({ template }: TemplateDetailProps) {
   return (
     <div>
       <h1 className="text-3xl font-semibold">{template.name}</h1>

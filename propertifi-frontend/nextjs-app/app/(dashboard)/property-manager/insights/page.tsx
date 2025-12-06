@@ -208,7 +208,7 @@ export default function MarketInsightsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    <Badge variant={avgScore >= 70 ? 'default' : 'secondary'}>
+                    <Badge variant="default">
                       {avgScore}% match
                     </Badge>
                     <span className="text-sm text-gray-600">{count} leads</span>

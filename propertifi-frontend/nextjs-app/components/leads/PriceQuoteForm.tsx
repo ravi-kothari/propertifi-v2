@@ -57,9 +57,9 @@ export default function PriceQuoteForm({ form }: PriceQuoteFormProps) {
               className="pl-7 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
           </div>
-          {errors.price_quote?.amount && (
+          {(errors.price_quote as any)?.amount && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.price_quote.amount.message as string}
+              {(errors.price_quote as any).amount.message as string}
             </p>
           )}
         </div>
@@ -79,9 +79,9 @@ export default function PriceQuoteForm({ form }: PriceQuoteFormProps) {
             <option value="yearly">Yearly</option>
             <option value="one-time">One-time</option>
           </select>
-          {errors.price_quote?.frequency && (
+          {(errors.price_quote as any)?.frequency && (
             <p className="mt-1 text-sm text-red-600">
-              {errors.price_quote.frequency.message as string}
+              {(errors.price_quote as any).frequency.message as string}
             </p>
           )}
         </div>
@@ -99,9 +99,9 @@ export default function PriceQuoteForm({ form }: PriceQuoteFormProps) {
           placeholder="Describe what's included in your management fee, your experience, and why you're the best choice..."
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         />
-        {errors.price_quote?.details && (
+        {(errors.price_quote as any)?.details && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.price_quote.details.message as string}
+            {(errors.price_quote as any).details.message as string}
           </p>
         )}
         <p className="mt-1 text-sm text-gray-500">
@@ -167,9 +167,9 @@ export default function PriceQuoteForm({ form }: PriceQuoteFormProps) {
           min={new Date().toISOString().split('T')[0]}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         />
-        {errors.price_quote?.valid_until && (
+        {(errors.price_quote as any)?.valid_until && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.price_quote.valid_until.message as string}
+            {(errors.price_quote as any).valid_until.message as string}
           </p>
         )}
       </div>

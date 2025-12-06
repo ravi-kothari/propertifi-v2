@@ -16,8 +16,14 @@ interface ManagerCardProps {
 }
 
 export function ManagerCard({ manager }: ManagerCardProps) {
-  const { addToComparison, removeFromComparison, isInComparison, comparisonList } = useComparison();
+  const comparison = useComparison();
   const { toast } = useToast();
+
+  if (!comparison) {
+    return null;
+  }
+
+  const { addToComparison, removeFromComparison, isInComparison, comparisonList } = comparison;
   const isSelected = isInComparison(manager.id);
 
   const handleCompareChange = (checked: boolean) => {

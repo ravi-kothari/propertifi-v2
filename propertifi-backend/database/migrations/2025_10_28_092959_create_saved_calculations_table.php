@@ -15,11 +15,15 @@ class CreateSavedCalculationsTable extends Migration
     {
         Schema::create('saved_calculations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('owner_id')->constrained('owners')->onDelete('cascade');
-            $table->string('calculator_type');
-            $table->json('input_data');
-            $table->json('result_data');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('calculator_type'); // roi, pm-fee, rent-estimate, rehab-cost
+            $table->string('name')->nullable(); // User-friendly name for the calculation
+            $table->json('input_data'); // All calculator inputs
+            $table->json('result_data')->nullable(); // Calculated results
             $table->timestamps();
+
+            // Index for faster queries
+            $table->index(['user_id', 'calculator_type']);
         });
     }
 

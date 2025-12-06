@@ -24,9 +24,15 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'owner', // Default role for new registrations
         ]);
 
         $user->sendEmailVerificationNotification();
+
+        // Link any existing leads with the same email to this new user account
+        \App\Models\Lead::where('email', $user->email)
+            ->whereNull('owner_id')
+            ->update(['owner_id' => $user->id]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -38,6 +44,7 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'type' => $user->type,
+                'role' => $user->role,
                 'email_verified_at' => $user->email_verified_at,
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,

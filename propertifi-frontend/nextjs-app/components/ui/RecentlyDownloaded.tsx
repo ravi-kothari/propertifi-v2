@@ -1,4 +1,8 @@
-export default function RecentlyDownloaded({ templates }) {
+interface RecentlyDownloadedProps {
+  templates: any[];
+}
+
+export default function RecentlyDownloaded({ templates }: RecentlyDownloadedProps) {
   if (templates.length === 0) {
     return null;
   }

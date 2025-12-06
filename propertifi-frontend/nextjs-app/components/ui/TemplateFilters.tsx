@@ -1,4 +1,8 @@
-export default function TemplateFilters({ onStateChange }) {
+interface TemplateFiltersProps {
+  onStateChange: (state: string) => void;
+}
+
+export default function TemplateFilters({ onStateChange }: TemplateFiltersProps) {
   const states = ['All', 'California', 'Texas', 'Florida']; // Hardcoded for now
 
   return (

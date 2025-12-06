@@ -1,0 +1,1 @@
+- Always use gemini for tasks like documentaion or anything which doesn't involve coding to save some tokens.

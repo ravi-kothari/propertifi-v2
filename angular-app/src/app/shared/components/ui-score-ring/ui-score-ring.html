@@ -1,0 +1,15 @@
+<div class="relative inline-flex items-center justify-center" [ngClass]="sizeClass" role="progressbar"
+    [attr.aria-valuenow]="score" aria-valuemin="0" aria-valuemax="100">
+    <svg class="transform -rotate-90 w-full h-full">
+        <circle class="text-gray-200" stroke-width="4" stroke="currentColor" fill="transparent" [attr.r]="radius"
+            [attr.cx]="size === 'lg' ? 32 : (size === 'sm' ? 16 : 24)"
+            [attr.cy]="size === 'lg' ? 32 : (size === 'sm' ? 16 : 24)" />
+        <circle [class]="colorClass" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="transparent"
+            [attr.r]="radius" [attr.cx]="size === 'lg' ? 32 : (size === 'sm' ? 16 : 24)"
+            [attr.cy]="size === 'lg' ? 32 : (size === 'sm' ? 16 : 24)" [style.stroke-dasharray]="circumference"
+            [style.stroke-dashoffset]="strokeDashoffset" class="transition-all duration-1000 ease-out" />
+    </svg>
+    <span class="absolute font-bold text-gray-700">
+        {{ score }}
+    </span>
+</div>

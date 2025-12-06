@@ -1,0 +1,106 @@
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 font-heading">Saved Calculations</h1>
+            <p class="mt-1 text-sm text-gray-500">
+                Access your saved ROI and mortgage estimates.
+            </p>
+        </div>
+        <div class="flex space-x-3">
+            <app-ui-button routerLink="/calculators/roi" variant="outline" size="sm">
+                New ROI Calc
+            </app-ui-button>
+            <app-ui-button routerLink="/calculators/mortgage" variant="outline" size="sm">
+                New Mortgage Calc
+            </app-ui-button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="space-y-4">
+        <div *ngFor="let i of [1,2,3]" class="animate-pulse bg-white rounded-lg h-24 shadow-sm border border-gray-200">
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && calculations.length === 0"
+        class="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No saved calculations</h3>
+        <p class="mt-1 text-sm text-gray-500">Run a calculation and save it to reference later.</p>
+    </div>
+
+    <!-- Calculations List -->
+    <div *ngIf="!loading && calculations.length > 0"
+        class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+        <ul role="list" class="divide-y divide-gray-200">
+            <li *ngFor="let calc of calculations" class="p-6 hover:bg-gray-50 transition-colors duration-150">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-3">
+                            <h3 class="text-lg font-medium text-gray-900 truncate">{{ calc.name }}</h3>
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize"
+                                [ngClass]="{
+                                    'bg-blue-100 text-blue-800': calc.type === 'roi',
+                                    'bg-green-100 text-green-800': calc.type === 'mortgage'
+                                }">
+                                {{ calc.type }}
+                            </span>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Saved on {{ calc.created_at | date:'mediumDate' }}
+                        </p>
+
+                        <!-- ROI Preview -->
+                        <div *ngIf="calc.type === 'roi'" class="mt-2 flex space-x-6 text-sm">
+                            <div>
+                                <span class="text-gray-500">Cash Flow:</span>
+                                <span class="ml-1 font-medium"
+                                    [class.text-success]="(calc.results | asRoiResult).cashFlow > 0">
+                                    {{ (calc.results | asRoiResult).cashFlow | currency }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">ROI:</span>
+                                <span class="ml-1 font-medium text-gray-900">
+                                    {{ (calc.results | asRoiResult).cashOnCashRoi | number:'1.2-2' }}%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Mortgage Preview -->
+                        <div *ngIf="calc.type === 'mortgage'" class="mt-2 flex space-x-6 text-sm">
+                            <div>
+                                <span class="text-gray-500">Monthly Payment:</span>
+                                <span class="ml-1 font-medium text-gray-900">
+                                    {{ (calc.results | asMortgageResult).monthlyPayment | currency }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Loan Amount:</span>
+                                <span class="ml-1 font-medium text-gray-900">
+                                    {{ (calc.inputs | asMortgageInput).loanAmount | currency }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ml-4 flex-shrink-0 flex space-x-4">
+                        <button (click)="deleteCalculation(calc.id)"
+                            class="text-gray-400 hover:text-error transition-colors duration-200">
+                            <span class="sr-only">Delete</span>
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

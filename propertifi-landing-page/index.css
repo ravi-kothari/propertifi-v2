@@ -1,0 +1,128 @@
+/* Custom font import - must be first */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+  }
+}
+
+@layer components {
+  /* Glassmorphism effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-gray-900/80 backdrop-blur-md border border-white/10;
+  }
+
+  /* Custom button styles */
+  .btn-primary {
+    @apply bg-propertifi-orange hover:bg-propertifi-orange-dark text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-propertifi-blue hover:bg-propertifi-blue-dark text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300;
+  }
+
+  .card-glass {
+    @apply glass rounded-2xl p-6 shadow-glass hover:shadow-glass-hover transition-all duration-300;
+  }
+
+  /* Section padding */
+  .section-padding {
+    @apply py-20 md:py-24;
+  }
+
+  /* Container max-width */
+  .container-custom {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
+  /* Heading styles */
+  .heading-1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight;
+  }
+
+  .heading-2 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-extrabold;
+  }
+
+  .heading-3 {
+    @apply text-2xl md:text-3xl font-bold;
+  }
+
+  /* Scroll progress bar */
+  .scroll-progress {
+    @apply fixed top-0 left-0 h-1 bg-gradient-to-r from-propertifi-orange to-propertifi-blue z-50 transition-all duration-150;
+  }
+}
+
+@layer utilities {
+  /* Custom gradient backgrounds */
+  .gradient-orange-blue {
+    background: linear-gradient(135deg, #fc982d 0%, #3B82F6 100%);
+  }
+
+  .gradient-blue-purple {
+    background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  }
+
+  /* Text gradients */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-propertifi-orange to-propertifi-blue;
+  }
+
+  /* Animation delays */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-propertifi-orange/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-propertifi-orange;
+}
+
+/* Focus visible styles for accessibility */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-propertifi-blue;
+}

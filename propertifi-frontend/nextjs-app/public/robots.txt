@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Allow: /
 
+# Host
+Host: https://www.propertifi.com
+
+# Sitemaps
 Sitemap: https://www.propertifi.com/sitemap.xml

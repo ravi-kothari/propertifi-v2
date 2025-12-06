@@ -85,7 +85,7 @@ export function useLeadResponses(leadId: number | null | undefined) {
   return useQuery({
     queryKey: leadKeys.responses(leadId || 0),
     queryFn: async () => {
-      const response = await get<{ data: LeadResponse[] }>(`/v2/leads/${leadId}/responses`);
+      const response = await get<{ data: any[] }>(`/v2/leads/${leadId}/responses`);
       return response.data;
     },
     enabled: !!leadId,
@@ -100,7 +100,7 @@ export function useLeadNotes(leadId: number | null | undefined) {
   return useQuery({
     queryKey: leadKeys.notes(leadId || 0),
     queryFn: async () => {
-      const response = await get<{ data: LeadNote[] }>(`/v2/leads/${leadId}/notes`);
+      const response = await get<{ data: any[] }>(`/v2/leads/${leadId}/notes`);
       return response.data;
     },
     enabled: !!leadId,

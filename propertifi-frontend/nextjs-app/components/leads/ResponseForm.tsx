@@ -51,8 +51,8 @@ const RESPONSE_TYPES: { value: ResponseType; label: string; description: string;
 export default function ResponseForm({ leadId, onSuccess, onCancel }: ResponseFormProps) {
   const [selectedType, setSelectedType] = useState<ResponseType | null>(null);
 
-  const form = useForm<ResponseFormData>({
-    resolver: zodResolver(responseFormSchema),
+  const form = useForm<any>({
+    resolver: zodResolver(responseFormSchema) as any,
     defaultValues: {
       response_type: undefined,
       message: '',
@@ -144,7 +144,7 @@ export default function ResponseForm({ leadId, onSuccess, onCancel }: ResponseFo
             />
             {form.formState.errors.message && (
               <p className="mt-1 text-sm text-red-600">
-                {form.formState.errors.message.message}
+                {(form.formState.errors.message as any)?.message}
               </p>
             )}
           </div>

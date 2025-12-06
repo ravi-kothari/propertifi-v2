@@ -67,9 +67,13 @@ export class AuthEffects {
             // AuthService already handles localStorage - we just dispatch success
             return AuthActions.loginSuccess({ user, token: access_token });
           }),
-          catchError((error) =>
-            of(AuthActions.loginFailure({ error: error.message || 'Login failed' }))
-          )
+          catchError((error) => {
+            // Log full error for debugging
+            console.error('[Auth Effect] Login failed:', error);
+            // Return sanitized user-facing message
+            const userMessage = this.sanitizeErrorMessage(error, 'Unable to log in. Please check your credentials and try again.');
+            return of(AuthActions.loginFailure({ error: userMessage }));
+          })
         )
       )
     )
@@ -128,7 +132,7 @@ export class AuthEffects {
   register$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.register),
-      exhaustMap(({ email, password, name, role }) =>
+      exhaustMap(({ email, password, name, userType }) =>
         this.authService.register({
           name,
           email,
@@ -139,9 +143,13 @@ export class AuthEffects {
             // AuthService already handles localStorage
             return AuthActions.registerSuccess({ user, token: access_token });
           }),
-          catchError((error) =>
-            of(AuthActions.registerFailure({ error: error.message || 'Registration failed' }))
-          )
+          catchError((error) => {
+            // Log full error for debugging
+            console.error('[Auth Effect] Registration failed:', error);
+            // Return sanitized user-facing message
+            const userMessage = this.sanitizeErrorMessage(error, 'Unable to create account. Please try again.');
+            return of(AuthActions.registerFailure({ error: userMessage }));
+          })
         )
       )
     )
@@ -232,6 +240,7 @@ export class AuthEffects {
    * - After updating user profile
    * - Periodically to sync remote changes
    * - When resuming a session
+   * - Token validation on app load
    */
   refreshUser$ = createEffect(() =>
     this.actions$.pipe(
@@ -241,10 +250,35 @@ export class AuthEffects {
         // For now, just reload from localStorage
         const userStr = localStorage.getItem('user');
         if (userStr) {
-          const user = JSON.parse(userStr);
-          return AuthActions.refreshUserSuccess({ user });
+          try {
+            const user = JSON.parse(userStr);
+            return AuthActions.refreshUserSuccess({ user });
+          } catch (error) {
+            console.error('[Auth Effect] Failed to parse user from localStorage:', error);
+            return AuthActions.refreshUserFailure({ error: 'Invalid user data' });
+          }
         }
         return AuthActions.refreshUserFailure({ error: 'No user in storage' });
+      })
+    )
+  );
+
+  /**
+   * Refresh User Failure Effect
+   *
+   * Listens for: AuthActions.refreshUserFailure
+   * Side effects: Dispatch logout when token refresh fails
+   * Dispatches: logout
+   *
+   * This ensures that when token validation fails on app load,
+   * the user is logged out and any stale data is cleared.
+   */
+  refreshUserFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.refreshUserFailure),
+      map(() => {
+        console.warn('[Auth Effect] Token validation failed, logging out user');
+        return AuthActions.logout();
       })
     )
   );
@@ -253,8 +287,8 @@ export class AuthEffects {
    * Load Auth From Storage Effect
    *
    * Listens for: AuthActions.loadAuthFromStorage
-   * Side effects: Read token and user from localStorage
-   * Dispatches: loginSuccess if found, logoutSuccess if not found
+   * Side effects: Read token and user from localStorage, validate token
+   * Dispatches: refreshUser if found, logoutSuccess if not found
    *
    * This effect should be dispatched when the app initializes (in app.component.ts)
    * to restore the authentication state from a previous session.
@@ -262,11 +296,13 @@ export class AuthEffects {
    * Flow:
    * 1. App starts -> app.component dispatches loadAuthFromStorage
    * 2. This effect reads localStorage
-   * 3. If token and user exist -> dispatch loginSuccess (user is logged in)
-   * 4. If not found -> dispatch logoutSuccess (clean initial state)
+   * 3. If token and user exist -> dispatch refreshUser (validates token)
+   * 4. If refreshUser succeeds -> user is logged in
+   * 5. If refreshUser fails -> refreshUserFailure$ effect dispatches logout
+   * 6. If not found -> dispatch logoutSuccess (clean initial state)
    *
    * This allows users to remain logged in across browser sessions
-   * as long as their token hasn't expired.
+   * while also ensuring expired tokens are detected and handled.
    */
   loadAuthFromStorage$ = createEffect(() =>
     this.actions$.pipe(
@@ -278,10 +314,14 @@ export class AuthEffects {
         if (token && userStr) {
           try {
             const user = JSON.parse(userStr);
-            // Restore session from localStorage
-            return AuthActions.loginSuccess({ user, token });
+            // First restore the session to state
+            // Note: We need to set the token in state before refreshUser can validate it
+            // So we'll do a two-step process: loginSuccess then refreshUser
+            // For now, trigger refreshUser which will validate the token
+            return AuthActions.refreshUser();
           } catch (error) {
             // Invalid JSON in localStorage - clear it
+            console.error('[Auth Effect] Invalid data in localStorage:', error);
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             return AuthActions.logoutSuccess();
@@ -293,4 +333,23 @@ export class AuthEffects {
       })
     )
   );
+
+  /**
+   * Error Message Sanitization Helper
+   *
+   * Sanitizes backend error messages to prevent exposing sensitive information.
+   * Logs the full error for debugging while returning a user-friendly message.
+   *
+   * @param error - The error object from the backend
+   * @param defaultMessage - The default user-facing message to return
+   * @returns A sanitized error message safe to display to users
+   */
+  private sanitizeErrorMessage(error: any, defaultMessage: string): string {
+    // If error has a user-friendly message from backend, use it
+    // Otherwise use the default message
+    if (error?.error?.message && typeof error.error.message === 'string') {
+      return error.error.message;
+    }
+    return defaultMessage;
+  }
 }

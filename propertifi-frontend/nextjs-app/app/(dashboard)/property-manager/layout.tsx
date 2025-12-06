@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { WebSocketProvider } from '@/components/providers/WebSocketProvider';
 import { Sidebar } from '@/components/layout/Sidebar';
 import DashboardHeader from '@/components/layout/DashboardHeader';
@@ -14,13 +14,27 @@ export default function PropertyManagerLayout({
 }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!isLoading && !isAuthenticated) {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Redirect to login if not authenticated (only after mounted)
+    if (isMounted && !isLoading && !isAuthenticated) {
       router.push('/login?returnUrl=/property-manager');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isMounted, isAuthenticated, isLoading, router]);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   // Show loading state while checking auth
   if (isLoading) {

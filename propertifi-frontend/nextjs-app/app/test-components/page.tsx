@@ -88,7 +88,7 @@ export default function TestComponentsPage() {
                       <Button variant="primary">
                         Primary (Blue #2563EB)
                       </Button>
-                      <Button variant="secondary">
+                      <Button variant="default">
                         Secondary (Orange #F97316)
                       </Button>
                       <Button variant="outline">
@@ -110,7 +110,7 @@ export default function TestComponentsPage() {
                     </h3>
                     <div className="flex flex-wrap gap-3">
                       <Button variant="default">Default/Primary</Button>
-                      <Button variant="secondary">Secondary</Button>
+                      <Button variant="default">Secondary</Button>
                       <Button variant="outline">Outline</Button>
                       <Button variant="ghost">Ghost</Button>
                       <Button variant="destructive">Destructive</Button>
@@ -137,9 +137,9 @@ export default function TestComponentsPage() {
                       Size Comparison (Secondary)
                     </h3>
                     <div className="flex flex-wrap items-center gap-3">
-                      <Button size="sm" variant="secondary">Small Button</Button>
-                      <Button size="default" variant="secondary">Default Button</Button>
-                      <Button size="lg" variant="secondary">Large Button</Button>
+                      <Button size="sm" variant="default">Small Button</Button>
+                      <Button size="default" variant="default">Default Button</Button>
+                      <Button size="lg" variant="default">Large Button</Button>
                     </div>
                   </div>
 
@@ -150,7 +150,7 @@ export default function TestComponentsPage() {
                     </h3>
                     <div className="flex flex-wrap gap-3">
                       <Button disabled variant="primary">Disabled Primary</Button>
-                      <Button disabled variant="secondary">Disabled Secondary</Button>
+                      <Button disabled variant="default">Disabled Secondary</Button>
                       <Button disabled variant="outline">Disabled Outline</Button>
                       <Button variant="primary">
                         <svg
@@ -193,7 +193,7 @@ export default function TestComponentsPage() {
                         </Button>
                       </div>
                       <div className="flex gap-3">
-                        <Button variant="secondary">
+                        <Button variant="default">
                           Request a Quote
                         </Button>
                         <Button variant="ghost">
@@ -226,7 +226,7 @@ export default function TestComponentsPage() {
                       <Button variant="primary">
                         Primary Hover (darkens + shadow)
                       </Button>
-                      <Button variant="secondary">
+                      <Button variant="default">
                         Secondary Hover (darkens + shadow)
                       </Button>
                       <Button variant="outline">
@@ -800,7 +800,7 @@ export default function TestComponentsPage() {
                   {/* Full-screen Dialog */}
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="secondary">Full-screen Dialog</Button>
+                      <Button variant="default">Full-screen Dialog</Button>
                     </DialogTrigger>
                     <DialogContent size="full">
                       <DialogHeader>
@@ -878,7 +878,7 @@ export default function TestComponentsPage() {
                     Show Warning Toast
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="default"
                     onClick={() =>
                       toast({
                         variant: "info",

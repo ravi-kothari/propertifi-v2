@@ -1,4 +1,8 @@
-export default function CalculatorForm({ onFormChange }) {
+interface CalculatorFormProps {
+  onFormChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export default function CalculatorForm({ onFormChange }: CalculatorFormProps) {
   return (
     <form className="mr-4">
       <h3 className="font-semibold">Inputs</h3>

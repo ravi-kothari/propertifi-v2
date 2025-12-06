@@ -1,7 +1,7 @@
 import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
@@ -68,16 +68,18 @@ export const appConfig: ApplicationConfig = {
     /**
      * Animations Configuration
      *
-     * Enables Angular animations throughout the application.
+     * Enables Angular animations throughout the application asynchronously.
      * Required for:
      * - Route transition animations (defined in route-animations.ts)
      * - Material UI component animations
      * - Custom component animations
      *
+     * Using provideAnimationsAsync() instead of deprecated provideAnimations()
+     * for better performance through lazy-loading of animation modules.
      * Without this, animations would be disabled and transitions
      * would be instant (which might be desired for performance-critical apps).
      */
-    provideAnimations(),
+    provideAnimationsAsync(),
 
     /**
      * NgRx Store Configuration

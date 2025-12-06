@@ -258,7 +258,7 @@ export default function TypographyDemoPage() {
                   <div>
                     <Muted className="mb-2">Secondary Variant</Muted>
                     <Paragraph>
-                      Run <Code variant="secondary">npm run dev</Code> to start
+                      Run <Code variant="default">npm run dev</Code> to start
                       the development server on port 3000.
                     </Paragraph>
                   </div>
@@ -278,7 +278,7 @@ export default function TypographyDemoPage() {
                       To customize the primary color, update the{" "}
                       <Code>tailwind.config.ts</Code> file. Set{" "}
                       <Code variant="primary">primary.600</Code> to your brand
-                      color like <Code variant="secondary">#2563EB</Code>.
+                      color like <Code variant="default">#2563EB</Code>.
                     </Paragraph>
                   </div>
                 </div>

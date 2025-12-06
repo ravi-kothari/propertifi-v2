@@ -1,7 +1,11 @@
 import DashboardHeader from './DashboardHeader';
 import DashboardSidebar from './DashboardSidebar';
 
-export default function DashboardLayout({ children }) {
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex h-screen bg-gray-100">
       <DashboardSidebar />

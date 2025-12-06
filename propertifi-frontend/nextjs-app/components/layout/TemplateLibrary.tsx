@@ -20,13 +20,13 @@ const allTemplates = [
 export default function TemplateLibrary() {
   const [searchQuery, setSearchQuery] = useState('');
   const [stateFilter, setStateFilter] = useState('All');
-  const [recentlyDownloaded, setRecentlyDownloaded] = useState([]);
+  const [recentlyDownloaded, setRecentlyDownloaded] = useState<any[]>([]);
 
-  const handleStateChange = (state) => {
+  const handleStateChange = (state: string) => {
     setStateFilter(state);
   };
 
-  const handleDownload = (template) => {
+  const handleDownload = (template: any) => {
     setRecentlyDownloaded(prev => [template, ...prev.slice(0, 2)]);
   };
 

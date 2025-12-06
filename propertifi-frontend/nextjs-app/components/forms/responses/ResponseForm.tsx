@@ -7,7 +7,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { useSubmitResponse } from "@/lib/api";
+import { useSubmitResponse } from "@/hooks/useLeads";
 import { ResponseTypeSelector } from "./ResponseTypeSelector";
 import { ContactInfoForm } from "./ContactInfoForm";
 import { AvailabilityScheduler } from "./AvailabilityScheduler";
@@ -33,7 +33,7 @@ export function ResponseForm({ leadId }: { leadId: string }) {
   const responseType = form.watch("response_type");
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    submitResponse.mutate({ leadId, ...values });
+    submitResponse.mutate({ leadId: parseInt(leadId, 10), data: values as any });
   }
 
   return (

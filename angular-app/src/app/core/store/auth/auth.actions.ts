@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { User } from './auth.state';
+import { User, UserType } from './auth.state';
 
 /**
  * Authentication Actions
@@ -71,11 +71,13 @@ export const loginFailure = createAction(
  * @property email - User's email address
  * @property password - User's chosen password
  * @property name - User's full name
- * @property role - User's role (owner, property-manager, admin)
+ * @property userType - User's type (owner, pm, admin, AccountManager)
+ *                      Note: Using 'userType' instead of 'type' to avoid conflict
+ *                      with NgRx's reserved 'type' property
  */
 export const register = createAction(
   '[Auth] Register',
-  props<{ email: string; password: string; name: string; role: string }>()
+  props<{ email: string; password: string; name: string; userType: UserType }>()
 );
 
 /**

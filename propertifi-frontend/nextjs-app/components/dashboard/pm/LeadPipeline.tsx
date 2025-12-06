@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLeads } from '@/hooks/useLeads';
-import { LeadPipelineSkeleton } from '@/components/ui/Skeleton';
+import { LeadPipelineSkeleton } from '@/components/ui/skeleton';
 import { PageErrorMessage } from '@/components/ui/ErrorMessage';
 import { LeadCard } from '@/components/leads/LeadCard';
 import LeadDetailModal from '@/components/leads/LeadDetailModal';

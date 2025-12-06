@@ -114,7 +114,7 @@ export const handlers = [
   // Submit Response
   http.post(`${API_BASE_URL}/v2/leads/:leadId/responses`, async ({ request, params }) => {
     const { leadId } = params;
-    const body = await request.json();
+    const body = await request.json() as Record<string, any>;
 
     const newResponse = {
       id: mockResponses.length + 1,
@@ -125,7 +125,7 @@ export const handlers = [
       updated_at: new Date().toISOString(),
     };
 
-    mockResponses.push(newResponse);
+    mockResponses.push(newResponse as any);
 
     return HttpResponse.json({
       data: newResponse,

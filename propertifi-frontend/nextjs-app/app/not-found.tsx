@@ -129,7 +129,7 @@ export default function NotFound() {
             Get matched with qualified property managers in your area in just minutes
           </p>
           <Link href="/">
-            <Button variant="secondary" size="lg">
+            <Button variant="default" size="lg">
               Get Started Free
             </Button>
           </Link>

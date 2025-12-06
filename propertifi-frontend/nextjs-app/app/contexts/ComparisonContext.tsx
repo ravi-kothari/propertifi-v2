@@ -60,6 +60,10 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
 export function useComparison() {
   const context = useContext(ComparisonContext);
   if (context === undefined) {
+    // Return null during pre-render instead of throwing
+    if (typeof window === 'undefined') {
+      return null;
+    }
     throw new Error('useComparison must be used within a ComparisonProvider');
   }
   return context;
