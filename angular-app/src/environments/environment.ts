@@ -7,7 +7,9 @@ export const environment = {
         cluster: 'mt1',
         wsHost: 'localhost',
         wsPort: 6001,
+        wssPort: 6001,
         forceTLS: false,
+        encrypted: false,
         disableStats: true,
     },
     googleMapsApiKey: 'YOUR_API_KEY_HERE'

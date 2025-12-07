@@ -4,6 +4,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { map, catchError, exhaustMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../auth/auth.service';
+import { WebSocketService } from '../../services/websocket.service';
 import * as AuthActions from './auth.actions';
 
 /**
@@ -37,6 +38,7 @@ export class AuthEffects {
   private actions$ = inject(Actions);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private websocketService = inject(WebSocketService);
 
   /**
    * Login Effect
@@ -83,22 +85,35 @@ export class AuthEffects {
    * Login Success Effect
    *
    * Listens for: AuthActions.loginSuccess
-   * Side effects: Navigate to appropriate dashboard based on user type
+   * Side effects:
+   *   - Initialize WebSocket connection with user token
+   *   - Navigate to appropriate dashboard based on user type
    * Dispatches: Nothing (dispatch: false)
    *
-   * This is a "dispatch: false" effect because it only performs navigation.
-   * Navigation is a side effect that doesn't need to dispatch another action.
+   * This is a "dispatch: false" effect because it only performs side effects.
+   * Side effects performed:
+   * 1. Establish WebSocket connection for real-time updates
+   * 2. Navigate to the appropriate dashboard based on user role
    *
    * Route mapping by user type:
    * - admin -> /admin (admin dashboard)
    * - owner -> /dashboard/owner (owner dashboard)
    * - pm -> /dashboard/pm (property manager dashboard)
+   *
+   * WebSocket connection enables:
+   * - Real-time notifications
+   * - Live lead updates
+   * - Dashboard analytics updates
    */
   loginSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AuthActions.loginSuccess),
-        tap(({ user }) => {
+        tap(({ user, token }) => {
+          // Initialize WebSocket connection with authentication token
+          // This enables real-time features for the authenticated user
+          this.websocketService.connect(token);
+
           // Navigate based on user type
           if (user.type === 'admin') {
             this.router.navigate(['/admin']);
@@ -181,13 +196,21 @@ export class AuthEffects {
    * Logout Effect
    *
    * Listens for: AuthActions.logout
-   * Side effects: Call AuthService.logout() to clear session
+   * Side effects:
+   *   - Call AuthService.logout() to clear session
+   *   - Disconnect WebSocket connection
    * Dispatches: logoutSuccess
    *
    * AuthService.logout() is a void method that:
    * - Clears localStorage (token, user)
    * - Optionally calls backend to invalidate token
    * - Performs any other cleanup
+   *
+   * WebSocket cleanup is important to:
+   * - Free up resources
+   * - Close unnecessary connections
+   * - Prevent memory leaks
+   * - Stop receiving notifications for logged-out user
    *
    * We always dispatch logoutSuccess, even if backend call fails,
    * because we want to clear local state regardless.
@@ -196,6 +219,9 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(AuthActions.logout),
       tap(() => {
+        // Disconnect WebSocket to stop real-time updates and free resources
+        this.websocketService.disconnect();
+
         // AuthService.logout() handles all cleanup
         this.authService.logout();
       }),
@@ -249,7 +275,9 @@ export class AuthEffects {
         // TODO: Replace with actual API call when backend endpoint exists
         // For now, just reload from localStorage
         const userStr = localStorage.getItem('user');
-        if (userStr) {
+        const token = localStorage.getItem('token');
+
+        if (userStr && token) {
           try {
             const user = JSON.parse(userStr);
             return AuthActions.refreshUserSuccess({ user });
@@ -261,6 +289,32 @@ export class AuthEffects {
         return AuthActions.refreshUserFailure({ error: 'No user in storage' });
       })
     )
+  );
+
+  /**
+   * Refresh User Success Effect
+   *
+   * Listens for: AuthActions.refreshUserSuccess
+   * Side effects: Re-initialize WebSocket connection when user is refreshed
+   * Dispatches: Nothing (dispatch: false)
+   *
+   * When the user is refreshed (typically on app load), we need to
+   * re-establish the WebSocket connection if a token is available.
+   * This ensures real-time features work after page reload.
+   */
+  refreshUserSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.refreshUserSuccess),
+        tap(() => {
+          const token = localStorage.getItem('token');
+          if (token) {
+            // Re-initialize WebSocket connection with stored token
+            this.websocketService.connect(token);
+          }
+        })
+      ),
+    { dispatch: false }
   );
 
   /**
@@ -313,11 +367,9 @@ export class AuthEffects {
 
         if (token && userStr) {
           try {
-            const user = JSON.parse(userStr);
-            // First restore the session to state
-            // Note: We need to set the token in state before refreshUser can validate it
-            // So we'll do a two-step process: loginSuccess then refreshUser
-            // For now, trigger refreshUser which will validate the token
+            // Validate that user data is parseable JSON
+            JSON.parse(userStr);
+            // Trigger refreshUser which will validate the token
             return AuthActions.refreshUser();
           } catch (error) {
             // Invalid JSON in localStorage - clear it
