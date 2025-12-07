@@ -28,7 +28,8 @@
                     formControlName="password_confirmation"
                     [error]="registerForm.get('password_confirmation')?.invalid && registerForm.get('password_confirmation')?.touched ? 'Password confirmation is required' : ''"></app-ui-input>
 
-                <div *ngIf="error" class="rounded-md bg-error-light p-4 animate-fade-in">
+                <!-- Client-side validation error (e.g., password mismatch) -->
+                <div *ngIf="clientError()" class="rounded-md bg-error-light p-4 animate-fade-in">
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg class="h-5 w-5 text-error" viewBox="0 0 20 20" fill="currentColor">
@@ -39,14 +40,32 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-error">
-                                {{ error }}
+                                {{ clientError() }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server-side validation error (from backend API) -->
+                <div *ngIf="serverError$ | async as serverError" class="rounded-md bg-error-light p-4 animate-fade-in">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-error" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-error">
+                                {{ serverError }}
                             </h3>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <app-ui-button type="submit" [loading]="isLoading()" [fullWidth]="true" variant="primary">
+                    <app-ui-button type="submit" [loading]="(isLoading$ | async) || false" [fullWidth]="true" variant="primary">
                         Create account
                     </app-ui-button>
                 </div>

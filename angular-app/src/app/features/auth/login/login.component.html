@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <div *ngIf="errorMessage()" class="rounded-md bg-error-light p-4 animate-fade-in">
+        <div *ngIf="errorMessage$ | async as errorMessage" class="rounded-md bg-error-light p-4 animate-fade-in">
           <div class="flex">
             <div class="flex-shrink-0">
               <svg class="h-5 w-5 text-error" viewBox="0 0 20 20" fill="currentColor">
@@ -48,14 +48,14 @@
             </div>
             <div class="ml-3">
               <h3 class="text-sm font-medium text-error">
-                {{ errorMessage() }}
+                {{ errorMessage }}
               </h3>
             </div>
           </div>
         </div>
 
         <div>
-          <app-ui-button type="submit" [loading]="isLoading()" [fullWidth]="true" variant="primary">
+          <app-ui-button type="submit" [loading]="(isLoading$ | async) || false" [fullWidth]="true" variant="primary">
             Sign in
           </app-ui-button>
         </div>
