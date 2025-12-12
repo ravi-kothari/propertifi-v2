@@ -18,13 +18,14 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'type' => 'sometimes|string|in:owner,pm', // Allow owner or pm, validate strictly
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'owner', // Default role for new registrations
+            'type' => $request->type ?? 'owner', // Use requested type or default to owner
         ]);
 
         $user->sendEmailVerificationNotification();
@@ -33,6 +34,9 @@ class AuthController extends Controller
         \App\Models\Lead::where('email', $user->email)
             ->whereNull('owner_id')
             ->update(['owner_id' => $user->id]);
+
+        // Load role relationship to get permissions
+        $user->load('role');
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -44,7 +48,7 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'type' => $user->type,
-                'role' => $user->role,
+                'permissions' => $user->permissions, // Will use getPermissionsAttribute()
                 'email_verified_at' => $user->email_verified_at,
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,
@@ -71,9 +75,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Please verify your email address.'], 403);
         }
 
+        // Load role relationship to get permissions
+        $user->load('role');
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // Return user data without relationships to avoid serialization issues
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -82,6 +88,7 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'type' => $user->type,
+                'permissions' => $user->permissions, // Will use getPermissionsAttribute()
                 'email_verified_at' => $user->email_verified_at,
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,
@@ -100,11 +107,15 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
+        // Load role relationship to get permissions
+        $user->load('role');
+
         return response()->json([
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
             'type' => $user->type,
+            'permissions' => $user->permissions, // Will use getPermissionsAttribute()
             'email_verified_at' => $user->email_verified_at,
             'created_at' => $user->created_at,
             'updated_at' => $user->updated_at,

@@ -6,6 +6,7 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Models\UserPreferences;
 use App\Models\UserLeads;
+use App\Services\GeocodingService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -356,27 +357,81 @@ class LeadScoringService
         return $reasons;
     }
 
+    protected GeocodingService $geocodingService;
+
+    public function __construct()
+    {
+        $this->geocodingService = new GeocodingService();
+    }
+
     /**
-     * Simplified radius check
-     * In production, use proper geocoding service
+     * Check if lead is within service radius of any preferred ZIP code.
+     * Uses Haversine formula for accurate distance.
+     *
+     * @param string $leadZip
+     * @param array $preferredZips
+     * @param int $radiusMiles
+     * @return bool
      */
     protected function isWithinRadius(string $leadZip, array $preferredZips, int $radiusMiles): bool
     {
-        // Simplified: check if ZIP codes are close numerically
-        // In production, use actual lat/long distance calculation
-        $leadZipNum = (int)$leadZip;
+        // Get coordinates for lead ZIP
+        // In a real scenario, these should be cached or stored on the Lead model
+        $leadCoords = $this->geocodingService->getCoordinatesForZip($leadZip);
+        
+        if (!$leadCoords) {
+            // Fallback to simple check if geocoding fails
+            return in_array($leadZip, $preferredZips);
+        }
 
         foreach ($preferredZips as $prefZip) {
-            $prefZipNum = (int)$prefZip;
-            $diff = abs($leadZipNum - $prefZipNum);
+            $prefCoords = $this->geocodingService->getCoordinatesForZip($prefZip);
+            
+            if ($prefCoords) {
+                $distance = $this->calculateDistance(
+                    $leadCoords['lat'], 
+                    $leadCoords['lng'], 
+                    $prefCoords['lat'], 
+                    $prefCoords['lng']
+                );
 
-            // Rough approximation: 100 ZIP difference ≈ 50 miles
-            if ($diff <= ($radiusMiles * 2)) {
-                return true;
+                if ($distance <= $radiusMiles) {
+                    return true;
+                }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Calculate distance between two points using Haversine formula
+     *
+     * @param float $lat1 Latitude of point 1
+     * @param float $lon1 Longitude of point 1
+     * @param float $lat2 Latitude of point 2
+     * @param float $lon2 Longitude of point 2
+     * @return float Distance in miles
+     */
+    protected function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 3959; // Earth's radius in miles
+
+        $lat1 = deg2rad($lat1);
+        $lon1 = deg2rad($lon1);
+        $lat2 = deg2rad($lat2);
+        $lon2 = deg2rad($lon2);
+
+        $deltaLat = $lat2 - $lat1;
+        $deltaLon = $lon2 - $lon1;
+
+        $a = sin($deltaLat / 2) * sin($deltaLat / 2) +
+             cos($lat1) * cos($lat2) *
+             sin($deltaLon / 2) * sin($deltaLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 
     /**

@@ -52,20 +52,16 @@ class LeadResponseController extends Controller
         // Verify lead exists
         $lead = Lead::findOrFail($leadId);
 
+        // Authorize action using LeadPolicy
+        $this->authorize('update', $lead);
+
         // Get authenticated user (PM)
         $pmId = Auth::id();
 
-        // Find the UserLead relationship
+        // Find the UserLead relationship (still needed for data, but auth is handled above)
         $userLead = UserLeads::where('lead_id', $leadId)
             ->where('user_id', $pmId)
-            ->first();
-
-        if (!$userLead) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You do not have access to this lead.',
-            ], 403);
-        }
+            ->firstOrFail();
 
         // Transform frontend nested structure to backend flat structure
         $responseData = [
@@ -139,20 +135,11 @@ class LeadResponseController extends Controller
         // Verify lead exists
         $lead = Lead::findOrFail($leadId);
 
+        // Authorize action using LeadPolicy
+        $this->authorize('view', $lead);
+
         // Get authenticated user
         $pmId = Auth::id();
-
-        // Verify user has access to this lead
-        $userLead = UserLeads::where('lead_id', $leadId)
-            ->where('user_id', $pmId)
-            ->first();
-
-        if (!$userLead) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You do not have access to this lead.',
-            ], 403);
-        }
 
         // Get all responses for this lead by this PM
         $responses = LeadResponse::where('lead_id', $leadId)

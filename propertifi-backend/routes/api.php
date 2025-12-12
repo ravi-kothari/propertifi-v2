@@ -166,6 +166,12 @@ Route::prefix('api')->group(function () {
             Route::get('/leads/{leadId}/responses', [V2\LeadResponseController::class, 'getResponses']);
         });
 
+        // AI Lead Scoring (Protected - requires auth)
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::get('/leads/{leadId}/score', [V2\LeadScoringController::class, 'getLeadScore']);
+            Route::get('/leads/scores/my-scores', [V2\LeadScoringController::class, 'getMyLeadScores']);
+        });
+
         // Authentication
         Route::post('/auth/register', [V2\AuthController::class, 'register']);
         Route::post('/auth/login', [V2\AuthController::class, 'login']);

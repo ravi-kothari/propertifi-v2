@@ -30,7 +30,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Model the Buy, Rehab, Rent, Refinance, Repeat strategy and equity extraction.',
       icon: '🔄',
       href: '/calculators/brrrr',
-      status: 'coming-soon',
+      status: 'live',
     },
     {
       id: 'buy-vs-rent',
@@ -38,7 +38,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Compare the financial impact of buying versus renting over time.',
       icon: '⚖️',
       href: '/calculators/buy-vs-rent',
-      status: 'coming-soon',
+      status: 'live',
     },
     {
       id: 'house-hacking',
@@ -46,7 +46,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Analyze living in one unit while renting out others to reduce housing costs.',
       icon: '🏘️',
       href: '/calculators/house-hacking',
-      status: 'coming-soon',
+      status: 'live',
     },
     {
       id: '1031-exchange',
@@ -54,7 +54,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Calculate tax deferral benefits and timeline for like-kind exchanges.',
       icon: '🔁',
       href: '/calculators/1031-exchange',
-      status: 'coming-soon',
+      status: 'live',
     },
     {
       id: 'str',
@@ -62,7 +62,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Compare short-term rental income versus traditional long-term rentals.',
       icon: '🏖️',
       href: '/calculators/short-term-rental',
-      status: 'coming-soon',
+      status: 'live',
     },
   ],
   'Financial Planning': [
@@ -72,7 +72,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Calculate monthly payments including principal, interest, taxes, and insurance.',
       icon: '🏦',
       href: '/calculators/mortgage',
-      status: 'coming-soon',
+      status: 'live',
     },
     {
       id: 'depreciation',
@@ -80,7 +80,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Calculate annual tax depreciation deductions for rental properties.',
       icon: '📉',
       href: '/calculators/depreciation',
-      status: 'coming-soon',
+      status: 'live',
     },
   ],
   'Rental & Property Management': [
@@ -130,7 +130,7 @@ const calculators: Record<string, Calculator[]> = {
   ],
 };
 
-export default function CalculatorsPage() {
+export default function CalculatorHub() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
