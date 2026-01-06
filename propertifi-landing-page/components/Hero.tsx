@@ -34,38 +34,14 @@ const Hero: React.FC = () => {
 
   return (
     <section className="relative bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white py-20 md:py-32 overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* Background with subtle gradient overlay - cleaner without animated orbs */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('https://picsum.photos/id/1015/1920/1080')] bg-cover bg-center opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-propertifi-blue/10 via-transparent to-propertifi-orange/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
 
-        {/* Animated gradient orbs */}
-        <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-propertifi-blue rounded-full opacity-20 blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-propertifi-orange rounded-full opacity-20 blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            x: [0, -50, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+        {/* Static subtle accent shapes */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-propertifi-blue rounded-full opacity-10 blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-propertifi-orange rounded-full opacity-10 blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -236,7 +212,7 @@ const Hero: React.FC = () => {
       {/* Bottom wave decoration */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg className="w-full h-16 md:h-24" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <path d="M0 0L60 10C120 20 240 40 360 46.7C480 53 600 47 720 43.3C840 40 960 40 1080 46.7C1200 53 1320 67 1380 73.3L1440 80V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V0Z" fill="white"/>
+          <path d="M0 0L60 10C120 20 240 40 360 46.7C480 53 600 47 720 43.3C840 40 960 40 1080 46.7C1200 53 1320 67 1380 73.3L1440 80V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V0Z" fill="white" />
         </svg>
       </div>
     </section>

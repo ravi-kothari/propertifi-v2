@@ -1,0 +1,59 @@
+/* You can add global styles to this file, and also import other style files */
+.step-form {
+    position: inherit;
+}
+.cancel-btn {
+    background-color: #f00;
+    border-radius: 6px;
+    padding: 15px 20px;
+    color: var(--white);
+    font-family: Graphik;
+    border: 2px solid transparent;
+    font-size: 16px;
+    transition: all ease-in-out 0.3s;
+    line-height: 19px;
+}
+.margin-center{margin: 0 auto;}
+.cta-button2 {
+    background-color: #FF7A00;
+    color: white;
+    padding: 10px 19px;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+    display: inline-flex;
+    width: 193px;
+    align-items: center;
+    margin-top: 30px;
+}
+.input-label2 {
+    color: #FFFFFF;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 13px;
+}
+.logo-part{ width: 450px;}
+.info-div{    min-height: 300px;
+    padding: 22px;
+    border-radius: 9px;
+    margin-bottom: 16px; background-color: #f9fafc;}
+.left-side-info{ width: 359px;}
+.custom-content h2 {
+    font-size: 1.5rem !important; margin: 20px 0px;
+}
+.custom-content h3 {
+    font-size: 1.17rem !important; margin: 20px 0px;
+}
+@media (max-width: 767px){
+    .left-side-info{
+        display: none;
+    }
+    .info-div{
+        width:370px;
+    }
+}
+.mt-66{margin-top: 66px;}

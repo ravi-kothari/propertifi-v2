@@ -36,29 +36,29 @@ use App\Http\Controllers\Admin;
 
 
 Route::prefix('api')->group(function () {
-	// Location/State endpoints (Next.js API requirements)
-	Route::get('/states', [LocationController::class, 'getStates']);
-	Route::get('/states/{stateCode}/cities', [LocationController::class, 'getCitiesByState']);
+    // Location/State endpoints (Next.js API requirements)
+    Route::get('/states', [LocationController::class, 'getStates']);
+    Route::get('/states/{stateCode}/cities', [LocationController::class, 'getCitiesByState']);
 
-	// Testimonials endpoint (Next.js API requirements)
-	Route::get('/testimonials/published', [TestimonialController::class, 'published']);
+    // Testimonials endpoint (Next.js API requirements)
+    Route::get('/testimonials/published', [TestimonialController::class, 'published']);
 
-	// Blog endpoints (Next.js API requirements)
-	Route::get('/blogs/latest', [BlogController::class, 'latest']);
-	Route::get('/blogs/search', [BlogController::class, 'search']);
-	Route::get('/blogs/{slug}', [BlogController::class, 'show']);
-	Route::get('/blogs', [BlogController::class, 'index']);
+    // Blog endpoints (Next.js API requirements)
+    Route::get('/blogs/latest', [BlogController::class, 'latest']);
+    Route::get('/blogs/search', [BlogController::class, 'search']);
+    Route::get('/blogs/{slug}', [BlogController::class, 'show']);
+    Route::get('/blogs', [BlogController::class, 'index']);
 
-	// Lead submission endpoint (Next.js API requirements)
-	Route::post('/home-page-lead', [LeadController::class, 'store']);
+    // Lead submission endpoint (Next.js API requirements)
+    Route::post('/home-page-lead', [LeadController::class, 'store']);
 
-	// Question endpoints for multi-step form (Next.js API requirements)
-	Route::get('/questions', [QuestionController::class, 'index']);
-	Route::get('/questions/step/{step}', [QuestionController::class, 'getByStep']);
+    // Question endpoints for multi-step form (Next.js API requirements)
+    Route::get('/questions', [QuestionController::class, 'index']);
+    Route::get('/questions/step/{step}', [QuestionController::class, 'getByStep']);
 
-	// Calculator endpoints (Next.js API requirements)
-	Route::post('/calculator-logs', [CalculatorController::class, 'logUsage']);
-	Route::get('/calculator-stats', [CalculatorController::class, 'getStatistics']);
+    // Calculator endpoints (Next.js API requirements)
+    Route::post('/calculator-logs', [CalculatorController::class, 'logUsage']);
+    Route::get('/calculator-stats', [CalculatorController::class, 'getStatistics']);
     Route::post('/calculator/roi', [CalculatorController::class, 'calculateRoi']);
     Route::post('/calculator/mortgage', [CalculatorController::class, 'calculateMortgage']);
     Route::post('/calculator/rent-vs-buy', [CalculatorController::class, 'calculateRentVsBuy']);
@@ -73,7 +73,9 @@ Route::prefix('api')->group(function () {
 
     // Property Manager endpoints (Next.js API requirements)
     Route::get('/property-managers', [PropertyManagerController::class, 'index']);
-    Route::get('/property-managers/{id}', [PropertyManagerController::class, 'getById']);
+    Route::get('/property-managers/state/{state}/cities', [PropertyManagerController::class, 'getCitiesByState']);
+    Route::get('/property-managers/{slug}', [PropertyManagerController::class, 'getBySlug']);
+    Route::get('/property-managers/{state}/{city}', [PropertyManagerController::class, 'getByCity']);
     Route::get('/property-managers/{state}/{city}/{slug}', [PropertyManagerController::class, 'show']);
 
     // PM Dashboard endpoint
@@ -234,24 +236,24 @@ Route::prefix('api')->group(function () {
         Route::apiResource('document-categories', Admin\DocumentCategoryController::class);
     });
 
-	// Legacy endpoints (keep for Angular compatibility)
-	Route::post('/lead/save',[HomePageController::class, 'leadSave']);
-	Route::post('/agent/save',[HomePageController::class, 'agentSave']);
-	Route::post('/newsletter/save',[HomePageController::class, 'newsletterSave']);
-	Route::post('/blog-category/list',[HomePageController::class, 'blogCategoryList']);
-	Route::post('/blogs/list',[HomePageController::class, 'blogList']);
-	Route::post('/blog/get',[HomePageController::class, 'blogGet']);
-	Route::post('/testimonial/list',[HomePageController::class, 'testimonialList']);
-	Route::post('/state/code/list',[HomePageController::class, 'stateCodeList']);
-	Route::post('/city/list',[HomePageController::class, 'cityList']);
-	Route::post('/faq/list',[HomePageController::class, 'faqList']);
-	Route::post('/page/get',[HomePageController::class, 'getPageContent']);
-	Route::post('/agents/list',[HomePageController::class, 'getAgentList']);
-	Route::post('/agent/get',[HomePageController::class, 'getAgent']);
-	Route::post('/contact/save',[HomePageController::class, 'contactSave']);
-	Route::post('/question/list',[HomePageController::class, 'questionList']);
-	Route::post('/law/get',[HomePageController::class, 'getLaw']);
-	Route::any('/testimonial/get',[HomePageController::class, 'getTestimonial']);
+    // Legacy endpoints (keep for Angular compatibility)
+    Route::post('/lead/save', [HomePageController::class, 'leadSave']);
+    Route::post('/agent/save', [HomePageController::class, 'agentSave']);
+    Route::post('/newsletter/save', [HomePageController::class, 'newsletterSave']);
+    Route::post('/blog-category/list', [HomePageController::class, 'blogCategoryList']);
+    Route::post('/blogs/list', [HomePageController::class, 'blogList']);
+    Route::post('/blog/get', [HomePageController::class, 'blogGet']);
+    Route::post('/testimonial/list', [HomePageController::class, 'testimonialList']);
+    Route::post('/state/code/list', [HomePageController::class, 'stateCodeList']);
+    Route::post('/city/list', [HomePageController::class, 'cityList']);
+    Route::post('/faq/list', [HomePageController::class, 'faqList']);
+    Route::post('/page/get', [HomePageController::class, 'getPageContent']);
+    Route::post('/agents/list', [HomePageController::class, 'getAgentList']);
+    Route::post('/agent/get', [HomePageController::class, 'getAgent']);
+    Route::post('/contact/save', [HomePageController::class, 'contactSave']);
+    Route::post('/question/list', [HomePageController::class, 'questionList']);
+    Route::post('/law/get', [HomePageController::class, 'getLaw']);
+    Route::any('/testimonial/get', [HomePageController::class, 'getTestimonial']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

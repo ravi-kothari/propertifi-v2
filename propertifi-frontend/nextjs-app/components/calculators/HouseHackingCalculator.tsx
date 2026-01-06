@@ -1,25 +1,35 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
+import { saveCalculation } from '@/lib/saved-calculations-api';
 
 export default function HouseHackingCalculator() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     purchasePrice: 450000,
-    downPayment: 15750, // 3.5% FHA typical
+    downPayment: 15750,
     interestRate: 6.5,
     loanTerm: 30,
-    totalUnits: 2, // Duplex default
-    otherUnitsRent: 1800, // Total rent from other units
-    propertyTax: 4500, // Annual
-    homeInsurance: 1200, // Annual
-    maintenance: 150, // Monthly
-    capex: 150, // Monthly
-    pmi: 180, // Monthly (Private Mortgage Insurance)
-    utilities: 0, // Monthly owner-paid utilities
+    totalUnits: 2,
+    otherUnitsRent: 1800,
+    propertyTax: 4500,
+    homeInsurance: 1200,
+    maintenance: 150,
+    capex: 150,
+    pmi: 180,
+    utilities: 0,
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const getAuthToken = () => {
+    if (typeof window !== 'undefined') return localStorage.getItem('auth_token');
+    return null;
+  };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -29,10 +39,10 @@ export default function HouseHackingCalculator() {
   };
 
   const calculateResults = () => {
-    const { 
-      purchasePrice, downPayment, interestRate, loanTerm, 
-      otherUnitsRent, propertyTax, homeInsurance, 
-      maintenance, capex, pmi, utilities 
+    const {
+      purchasePrice, downPayment, interestRate, loanTerm,
+      otherUnitsRent, propertyTax, homeInsurance,
+      maintenance, capex, pmi, utilities
     } = formData;
 
     const principal = purchasePrice - downPayment;
@@ -46,14 +56,14 @@ export default function HouseHackingCalculator() {
 
     const monthlyTax = propertyTax / 12;
     const monthlyInsurance = homeInsurance / 12;
-    
+
     // Total Monthly Expenses (PITI + PMI + Reserves)
     const totalMonthlyPITI = monthlyPrincipalAndInterest + monthlyTax + monthlyInsurance + pmi;
     const totalMonthlyExpenses = totalMonthlyPITI + maintenance + capex + utilities;
 
     // Net Housing Cost = Total Expenses - Rental Income
     const netHousingCost = totalMonthlyExpenses - otherUnitsRent;
-    
+
     // "Saved" compared to renting elsewhere (assuming you'd pay ~same as unit rent)
     // Or simpler: How much of mortgage is covered?
     const percentCovered = (otherUnitsRent / totalMonthlyExpenses) * 100;
@@ -79,17 +89,31 @@ export default function HouseHackingCalculator() {
     doc.text(`Total Units: ${formData.totalUnits}`, 20, 40);
     doc.text(`Rental Income (Other Units): $${formData.otherUnitsRent.toLocaleString()}/mo`, 20, 50);
     doc.text("------------------------------------------------", 20, 60);
-    doc.text(`Total Monthly PITI: $${results.totalMonthlyPITI.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 20, 70);
-    doc.text(`Total Operating Expenses: $${results.totalMonthlyExpenses.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 20, 80);
-    
+    doc.text(`Total Monthly PITI: $${results.totalMonthlyPITI.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, 20, 70);
+    doc.text(`Total Operating Expenses: $${results.totalMonthlyExpenses.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, 20, 80);
+
     doc.setFontSize(14);
     if (results.isPositive) {
-      doc.text(`PROFIT: You live for FREE + make $${Math.abs(results.netHousingCost).toLocaleString(undefined, {maximumFractionDigits: 2})}/mo!`, 20, 100);
+      doc.text(`PROFIT: You live for FREE + make $${Math.abs(results.netHousingCost).toLocaleString(undefined, { maximumFractionDigits: 2 })}/mo!`, 20, 100);
     } else {
-      doc.text(`Net Cost to Live: $${results.netHousingCost.toLocaleString(undefined, {maximumFractionDigits: 2})}/mo`, 20, 100);
+      doc.text(`Net Cost to Live: $${results.netHousingCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}/mo`, 20, 100);
     }
-    
+
     doc.save("house-hacking-analysis.pdf");
+  };
+
+  const handleSaveClick = async () => {
+    const token = getAuthToken();
+    if (!token) { router.push('/login?returnUrl=/calculators/house-hacking&message=Please login to save your calculations'); return; }
+    setIsSaving(true);
+    try {
+      await saveCalculation(token, { calculator_type: 'house-hacking', input_data: formData, result_data: results });
+      setSaveMessage({ type: 'success', text: 'Calculation saved successfully!' });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error: any) {
+      setSaveMessage({ type: 'error', text: error.message || 'Failed to save calculation' });
+      setTimeout(() => setSaveMessage(null), 5000);
+    } finally { setIsSaving(false); }
   };
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
@@ -99,7 +123,7 @@ export default function HouseHackingCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form Section */}
         <div className="space-y-6">
-          
+
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-blue-900 border-b border-blue-100 pb-2">Deal Details</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -164,7 +188,7 @@ export default function HouseHackingCalculator() {
               />
               <p className="text-xs text-gray-500 mt-1">Total rent from tenants (excluding your unit)</p>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Property Tax (Yr)</label>
@@ -201,7 +225,7 @@ export default function HouseHackingCalculator() {
                 <input
                   type="number"
                   value={formData.maintenance + formData.capex}
-                  onChange={(e) => setFormData({...formData, maintenance: Number(e.target.value)/2, capex: Number(e.target.value)/2})}
+                  onChange={(e) => setFormData({ ...formData, maintenance: Number(e.target.value) / 2, capex: Number(e.target.value) / 2 })}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
@@ -257,10 +281,12 @@ export default function HouseHackingCalculator() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <Button className="w-full" onClick={handleExport}>
-              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              Export Analysis PDF
+          {saveMessage && (<div className={`mb-4 p-3 rounded-lg text-center text-sm font-medium ${saveMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>{saveMessage.text}</div>)}
+
+          <div className="mt-8 space-y-3">
+            <Button className="w-full" onClick={handleExport}><ArrowDownTrayIcon className="mr-2 h-4 w-4" />Export Analysis PDF</Button>
+            <Button variant="outline" className="w-full" onClick={handleSaveClick} disabled={isSaving}>
+              {isSaving ? (<><svg className="animate-spin mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : (<><BookmarkIcon className="mr-2 h-4 w-4" />Save Calculation</>)}
             </Button>
           </div>
         </div>

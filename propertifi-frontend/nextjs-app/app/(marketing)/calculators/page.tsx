@@ -117,7 +117,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Calculate lawful deductions from tenant security deposits.',
       icon: '🔒',
       href: '/calculators/security-deposit',
-      status: 'coming-soon',
+      status: 'live',
     },
     {
       id: 'lease-buyout',
@@ -125,7 +125,7 @@ const calculators: Record<string, Calculator[]> = {
       description: 'Determine fair pricing for early lease termination.',
       icon: '📝',
       href: '/calculators/lease-buyout',
-      status: 'coming-soon',
+      status: 'live',
     },
   ],
 };

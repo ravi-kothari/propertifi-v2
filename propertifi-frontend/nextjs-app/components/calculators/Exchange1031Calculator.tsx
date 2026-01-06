@@ -1,22 +1,29 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
+import { saveCalculation } from '@/lib/saved-calculations-api';
 
 export default function Exchange1031Calculator() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     salePrice: 1000000,
-    sellingExpenses: 60000, // ~6% commissions + closing
+    sellingExpenses: 60000,
     mortgagePayoff: 400000,
     originalPrice: 600000,
     improvements: 50000,
     depreciationTaken: 150000,
-    capitalGainsRate: 20, // %
-    stateTaxRate: 5, // %
-    depreciationRecaptureRate: 25, // % (Fixed by IRS usually)
+    capitalGainsRate: 20,
+    stateTaxRate: 5,
+    depreciationRecaptureRate: 25,
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const getAuthToken = () => { if (typeof window !== 'undefined') return localStorage.getItem('auth_token'); return null; };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -26,10 +33,10 @@ export default function Exchange1031Calculator() {
   };
 
   const calculateResults = () => {
-    const { 
-      salePrice, sellingExpenses, mortgagePayoff, 
+    const {
+      salePrice, sellingExpenses, mortgagePayoff,
       originalPrice, improvements, depreciationTaken,
-      capitalGainsRate, stateTaxRate, depreciationRecaptureRate 
+      capitalGainsRate, stateTaxRate, depreciationRecaptureRate
     } = formData;
 
     // 1. Calculate Gain
@@ -43,7 +50,7 @@ export default function Exchange1031Calculator() {
     const federalCapitalGainsTax = Math.max(0, remainingGain) * (capitalGainsRate / 100);
     const stateTax = realizedGain * (stateTaxRate / 100);
     const njitTax = realizedGain * 0.038; // Net Investment Income Tax (NIIT) 3.8% for high earners
-    
+
     // Simplified Total Tax:
     const totalEstimatedTax = depreciationRecaptureTax + federalCapitalGainsTax + stateTax + njitTax;
 
@@ -51,9 +58,9 @@ export default function Exchange1031Calculator() {
     // To defer ALL tax:
     // 1. Reinvest ALL Net Proceeds (Equity)
     // 2. Acquire replacement property of EQUAL or GREATER value than Net Sale Price
-    
+
     const cashToReinvest = netSalePrice - mortgagePayoff; // Net Cash Proceeds
-    const replacementPropertyValueNeeded = netSalePrice; 
+    const replacementPropertyValueNeeded = netSalePrice;
     const newDebtNeeded = Math.max(0, replacementPropertyValueNeeded - cashToReinvest); // Must replace old debt or add cash
 
     return {
@@ -79,15 +86,27 @@ export default function Exchange1031Calculator() {
     doc.text(`Original Basis: $${formData.originalPrice.toLocaleString()}`, 20, 40);
     doc.text(`Realized Gain: $${results.realizedGain.toLocaleString()}`, 20, 50);
     doc.text("------------------------------------------------", 20, 60);
-    doc.text(`Total Estimated Tax (If Sold): $${results.totalEstimatedTax.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 20, 70);
-    doc.text(`   - Depreciation Recapture: $${results.depreciationRecaptureTax.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 25, 80);
-    doc.text(`   - Federal Cap Gains: $${results.federalCapitalGainsTax.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 25, 90);
+    doc.text(`Total Estimated Tax (If Sold): $${results.totalEstimatedTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 20, 70);
+    doc.text(`   - Depreciation Recapture: $${results.depreciationRecaptureTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 25, 80);
+    doc.text(`   - Federal Cap Gains: $${results.federalCapitalGainsTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 25, 90);
     doc.text("------------------------------------------------", 20, 100);
     doc.text(`EXCHANGE REQUIREMENTS (To Defer 100% Tax):`, 20, 115);
     doc.text(`1. Buy Replacement Property Value >= $${results.replacementPropertyValueNeeded.toLocaleString()}`, 20, 125);
     doc.text(`2. Reinvest Net Cash Proceeds >= $${results.cashToReinvest.toLocaleString()}`, 20, 135);
-    
+
     doc.save("1031-exchange-analysis.pdf");
+  };
+
+  const handleSaveClick = async () => {
+    const token = getAuthToken();
+    if (!token) { router.push('/login?returnUrl=/calculators/1031-exchange&message=Please login to save'); return; }
+    setIsSaving(true);
+    try {
+      await saveCalculation(token, { calculator_type: '1031-exchange', input_data: formData, result_data: results });
+      setSaveMessage({ type: 'success', text: 'Saved!' }); setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error: any) {
+      setSaveMessage({ type: 'error', text: error.message || 'Failed' }); setTimeout(() => setSaveMessage(null), 5000);
+    } finally { setIsSaving(false); }
   };
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
@@ -97,7 +116,7 @@ export default function Exchange1031Calculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form Section */}
         <div className="space-y-6">
-          
+
           {/* Sale Details */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-blue-900 border-b border-blue-100 pb-2">Relinquished Property (Sale)</h2>
@@ -271,10 +290,12 @@ export default function Exchange1031Calculator() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <Button className="w-full" onClick={handleExport}>
-              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              Export Exchange Analysis
+          {saveMessage && (<div className={`mb-4 p-3 rounded-lg text-center text-sm font-medium ${saveMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>{saveMessage.text}</div>)}
+
+          <div className="mt-8 space-y-3">
+            <Button className="w-full" onClick={handleExport}><ArrowDownTrayIcon className="mr-2 h-4 w-4" />Export Exchange Analysis</Button>
+            <Button variant="outline" className="w-full" onClick={handleSaveClick} disabled={isSaving}>
+              {isSaving ? (<><svg className="animate-spin mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : (<><BookmarkIcon className="mr-2 h-4 w-4" />Save Calculation</>)}
             </Button>
           </div>
         </div>

@@ -1,17 +1,27 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
+import { saveCalculation } from '@/lib/saved-calculations-api';
 
 export default function DepreciationCalculator() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     purchasePrice: 500000,
     landValue: 100000,
     placedInServiceDate: new Date().toISOString().split('T')[0],
-    propertyType: 'residential', // residential (27.5 years) or commercial (39 years)
+    propertyType: 'residential',
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const getAuthToken = () => {
+    if (typeof window !== 'undefined') return localStorage.getItem('auth_token');
+    return null;
+  };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -22,17 +32,17 @@ export default function DepreciationCalculator() {
 
   const calculateResults = () => {
     const { purchasePrice, landValue, propertyType } = formData;
-    
+
     // Depreciation Basis = Purchase Price - Land Value
     // (Land is not depreciable)
     const depreciableBasis = Math.max(0, purchasePrice - landValue);
-    
+
     // Recovery Period
     const recoveryPeriod = propertyType === 'residential' ? 27.5 : 39;
-    
+
     // Annual Depreciation
     const annualDepreciation = depreciableBasis / recoveryPeriod;
-    
+
     // Monthly Depreciation
     const monthlyDepreciation = annualDepreciation / 12;
 
@@ -54,9 +64,23 @@ export default function DepreciationCalculator() {
     doc.text(`Property Type: ${formData.propertyType === 'residential' ? 'Residential (27.5 yrs)' : 'Commercial (39 yrs)'}`, 20, 50);
     doc.text("------------------------------------------------", 20, 60);
     doc.text(`Depreciable Basis: $${results.depreciableBasis.toLocaleString()}`, 20, 70);
-    doc.text(`Annual Deduction: $${results.annualDepreciation.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 20, 80);
-    doc.text(`Monthly Deduction: $${results.monthlyDepreciation.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 20, 90);
+    doc.text(`Annual Deduction: $${results.annualDepreciation.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, 20, 80);
+    doc.text(`Monthly Deduction: $${results.monthlyDepreciation.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, 20, 90);
     doc.save("depreciation-schedule.pdf");
+  };
+
+  const handleSaveClick = async () => {
+    const token = getAuthToken();
+    if (!token) { router.push('/login?returnUrl=/calculators/depreciation&message=Please login to save your calculations'); return; }
+    setIsSaving(true);
+    try {
+      await saveCalculation(token, { calculator_type: 'depreciation', input_data: formData, result_data: results });
+      setSaveMessage({ type: 'success', text: 'Calculation saved successfully!' });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error: any) {
+      setSaveMessage({ type: 'error', text: error.message || 'Failed to save calculation' });
+      setTimeout(() => setSaveMessage(null), 5000);
+    } finally { setIsSaving(false); }
   };
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
@@ -67,7 +91,7 @@ export default function DepreciationCalculator() {
         {/* Form Section */}
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">Property Details</h2>
-          
+
           <div className="space-y-4">
             <div>
               <label htmlFor="purchasePrice" className="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
@@ -157,7 +181,7 @@ export default function DepreciationCalculator() {
               <span className="text-gray-600">Land Allocation</span>
               <span className="font-semibold text-gray-900">{((formData.landValue / formData.purchasePrice) * 100).toFixed(1)}%</span>
             </div>
-            
+
             <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
               <p className="text-sm text-blue-800">
                 <strong>Tip:</strong> Depreciation is a non-cash expense that reduces your taxable income, effectively increasing your cash flow.
@@ -165,10 +189,12 @@ export default function DepreciationCalculator() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <Button className="w-full" onClick={handleExport}>
-              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              Export PDF Schedule
+          {saveMessage && (<div className={`mb-4 p-3 rounded-lg text-center text-sm font-medium ${saveMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>{saveMessage.text}</div>)}
+
+          <div className="mt-8 space-y-3">
+            <Button className="w-full" onClick={handleExport}><ArrowDownTrayIcon className="mr-2 h-4 w-4" />Export PDF Schedule</Button>
+            <Button variant="outline" className="w-full" onClick={handleSaveClick} disabled={isSaving}>
+              {isSaving ? (<><svg className="animate-spin mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : (<><BookmarkIcon className="mr-2 h-4 w-4" />Save Calculation</>)}
             </Button>
           </div>
         </div>

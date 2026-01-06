@@ -44,8 +44,12 @@ export interface LeadAssignment {
   distance_miles?: number;
   match_score: number;
   status: 'pending' | 'contacted' | 'accepted' | 'rejected';
+  distributed_at?: string;
+  viewed_at?: string;
   contacted_at?: string;
   responded_at?: string;
+  response_type?: 'interested' | 'not_interested' | 'contacted' | 'declined';
+  response_notes?: string;
   created_at: string;
 }
 

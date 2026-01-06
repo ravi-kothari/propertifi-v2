@@ -1,0 +1,204 @@
+<div class="wrapper">
+   <app-header></app-header>
+   <div class="hero-section">
+     <div class="hero-banner-right wow fadeInUp">
+       <div class="container">
+         <div class="row align-items-center justify-content-center">
+           <div class="col-lg-6 wow fadeInUp">
+             <div class="hero-banner-content">
+               <h1 class="mb-4">AI-Powered Property Manager Matching, Simplified.</h1>
+               <p class="paragraph-large mb-4 mb-lg-5">Propertifi uses data-driven insights to connect property owners with top-rated, pre-vetted management professionals in their area. For free.</p>
+               <div class="hero-button-wrapper">
+                 <form class="newsletter-section" action="/search" method="get">
+                   <div class="d-flex align-items-center">
+                     <input type="text" maxlength="5" id="zipcode" class="form-control" placeholder="Enter your zipcode"/>
+                     <a class="btn btn-primary" (click)="saveZip()">Get Started</a>
+                   </div>
+                 </form>
+               </div>
+             </div>
+           </div>
+           <div class="col-lg-6 d-flex align-items-center justify-content-center">
+             <div class="hero-image"> <img src="assets/new/img/hero-illustration.png" alt="Property Management Illustration"> </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="main-services py-60">
+     <div class="container">
+       <div class="row">
+         <div class="col-lg-3 col-md-6">
+           <div class="top-box text-center box-border"> <img src="assets/new/img/Code.svg" alt="">
+             <h4>Intelligent Matching</h4>
+             <p>Our AI-driven platform quickly connects you with vetted property managers tailored to your specific property and needs.</p>
+           </div>
+         </div>
+         <div class="col-lg-3 col-md-6">
+           <div class="top-box text-center box-border"> <img src="assets/new/img/edit-ai.svg" alt="">
+             <h4>Customizable Solutions</h4>
+             <p>Define your criteria and receive personalized quotes and management proposals that align with your unique investment goals.</p>
+           </div>
+         </div>
+         <div class="col-lg-3 col-md-6">
+           <div class="top-box text-center box-border"> <img src="assets/new/img/User-ai.svg" alt="">
+             <h4>Guided by Verified Professionals</h4>
+             <p>Connect with a network of pre-screened, experienced property managers who provide expert guidance every step of the way.</p>
+           </div>
+         </div>
+         <div class="col-lg-3 col-md-6">
+           <div class="top-box text-center "> <img src="assets/new/img/Speed.svg" alt="">
+             <h4>Transparent & Streamlined</h4>
+             <p>Experience clear communication and a simplified process for finding and engaging your ideal property manager.</p>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="tab-section py-60">
+     <div class="container">
+       <div class="row justify-content-center align-items-start">
+         <div class="col-lg-6 col-xl-4">
+           <h2 class="">Your Path to Seamless Property Management</h2>
+           <nav>
+             <div class="nav nav-tabs pe-4 mb-3 border-0" id="nav-tab" role="tablist">
+               <button class="nav-link text-start border-0 rounded-0 mb-3 active" id="nav-Instantly-tab" data-bs-toggle="tab" data-bs-target="#nav-Instantly" type="button" role="tab" aria-controls="nav-Instantly" aria-selected="true">
+               <h4>Find Your Match Instantly</h4>
+               <p>Get a quick quote in seconds. No lengthy forms, just immediate insight into your potential coverage costs.</p>
+               </button>
+               <button class="nav-link text-start border-0 rounded-0 mb-3" id="nav-Coverage-tab" data-bs-toggle="tab" data-bs-target="#nav-Coverage" type="button" role="tab" aria-controls="nav-Coverage" aria-selected="false">
+               <h4>Compare & Customize Your Needs</h4>
+               <p>Review detailed profiles and compare proposals from matched managers. Customizing your service needs to align perfectly with your property goals.</p>
+               </button>
+               <button class="nav-link text-start border-0 rounded-0 mb-3" id="nav-Mind-tab" data-bs-toggle="tab" data-bs-target="#nav-Mind" type="button" role="tab" aria-controls="nav-Mind" aria-selected="false">
+               <h4>Gain Peace of Mind</h4>
+               <p>Engage with your chosen professional, knowing your investment is in expert hands. Enjoy peace of mind with reliable, hassle-free property management.</p>
+               </button>
+             </div>
+           </nav>
+           <div class="d-flex mt-5"> <a routerLink="/search" class="btn btn-primary text-white bg-btn-dark">Get Started</a> </div>
+         </div>
+         <div class="col-lg-6 px-lg-6 pb-5">
+           <div class="tab-content" id="nav-tabContent">
+             <div class="tab-pane fade active show" id="nav-Instantly" role="tabpanel" aria-labelledby="nav-Instantly-tab"> <img src="assets/new/img/tab1.png" class="img-fluid" alt=""> </div>
+             <div class="tab-pane fade" id="nav-Coverage" role="tabpanel" aria-labelledby="nav-Coverage-tab"> <img src="assets/new/img/tab2.png" class="img-fluid" alt=""> </div>
+             <div class="tab-pane fade" id="nav-Mind" role="tabpanel" aria-labelledby="nav-Mind-tab"> <img src="assets/new/img/tab3.png" class="img-fluid" alt=""> </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="test-section py-60">
+     <div class="container">
+       <div class="row">
+         <div class="col-md-8 mx-auto text-center">
+           <h2 class="">Trusted by thousands of <br>
+             property owners & investors</h2>
+         </div>
+       </div>
+       <div class="test-carousel owl-carousel owl-theme px-xl-5">
+
+         <div *ngFor="let testimonial of testimonials" class="item">
+           <div class="test-box text-center">
+             <div class="stars d-flex align-items-center justify-content-center"> <img src="assets/new/img/Star.svg" alt=""> <img src="assets/new/img/Star.svg" alt=""> <img src="assets/new/img/Star.svg" alt=""> <img src="assets/new/img/Star.svg" alt=""> <img src="assets/new/img/Star.svg" alt=""> </div>
+             <h6 class="desc">{{testimonial.description}}</h6>
+             <h6><strong>{{testimonial.heading}}</strong></h6>
+           </div>
+         </div>
+         
+       </div>
+     </div>
+   </div>
+   <div class="state py-60">
+     <div class="container">
+       <div class="row">
+         <div class="col-lg-6 px-lg-4">
+           <div class="main-box">
+             <div class="section-heading">
+               <h2 class="fw-light mb-lg-4 mb-3">Find Property Managers <br>
+                 by <span>State</span></h2>
+             </div>
+             <div class="no-record" *ngIf="loader">Loading...</div>
+             <ul *ngIf="!loader" class="state-select list-unstyled d-flex flex-wrap mb-0">
+                <li *ngFor="let state of states; let i = index"><p (click)="cityList(state.id,state.abbreviation_slug,'Half')" class="common-state-class" [id]="'state_'+state.id" [ngClass]="{'state-active': i === 0}">{{state.abbreviation}}</p></li>
+                <!-- <li *ngIf="stateLength=='Half'"><p (click)="stateList('Full')" class="common-state-class">See All</p></li> -->
+             </ul>
+             <div *ngIf="stateLength=='Half'" class="vew-all text-center"> <a id="view_all_state" (click)="stateList('Full')" style="cursor:pointer;">View All States</a> </div>
+           </div>
+         </div>
+         <div class="col-lg-6 px-lg-4">
+           <div class="main-box">
+             <div class="section-heading">
+               <h2 class="fw-light mb-lg-4 mb-3">Find Property Managers <br>
+                 by <span>City</span></h2>
+             </div>
+             <ul *ngIf="cities.length > 0" class="state-select2 list-unstyled d-flex flex-wrap">
+              <li *ngFor="let city of cities"><a routerLink="/agents/{{selectedState}}/{{city.slug}}"><p>{{city.city}}</p></a></li>
+              <!-- <li *ngIf="cityLength=='Half'"><p (click)="seeAllCity()"  class="common-state-class">See All</p></li> -->
+           </ul>
+           <div id="no-city-div" class="no-record" *ngIf="cities.length == 0">We are working hard to onboard property managers for this region. Please check back soon.</div>
+             
+             <div *ngIf="cities.length > 0 && cityLength=='Half'" class="vew-all text-center"> <a (click)="seeAllCity()" style="cursor:pointer;" id="view_all_city">View All Cities</a> </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="property-section py-60">
+     <div class="container">
+       <div class="row align-items-center">
+         <div class="col-lg-7">
+           <div class="property-box d-flex justify-content-between flex-wrap">
+             <div class="crd w-50 p-md-3 text-center"> <img src="assets/new/img/pro1.png" class="img-fluid mx-auto" alt="">
+               <h6>Single Family</h6>
+               <p>One unit, one house</p>
+             </div>
+             <div class="crd w-50 p-md-3 text-center"> <img src="assets/new/img/pro2.png" class="img-fluid mx-auto" alt="">
+               <h6>Multifamily</h6>
+               <p>Two to four units in a building</p>
+             </div>
+             <div class="crd w-50 p-md-3 text-center"> <img src="assets/new/img/pro3.png" class="img-fluid mx-auto" alt="">
+               <h6>HOA/COA</h6>
+               <p>Buildings with 5+ units</p>
+             </div>
+             <div class="crd w-50 p-md-3 text-center"> <img src="assets/new/img/pro4.png" class="img-fluid mx-auto" alt="">
+               <h6>Commercial</h6>
+               <p>An owned unit within a building</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-lg-5 col-md-9 mx-md-auto">
+           <h2 class="">Property Management for Every Investment Type</h2>
+           <h6 class="mt-3">From single-family homes to large multi-unit complexes, our network offers the perfect manager for your specific property.</h6>
+           <div class="d-flex mt-5"> <a routerLink="/search" class="btn btn-primary text-white bg-btn-dark">Get Started</a> </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="coverage-section" *ngIf="blogs.length > 0">
+     <div class="container">
+       <div class="row justify-content-center">
+         <h2 class="text-center text-white fw-light">Insights and tips for effective property management</h2>
+       </div>
+       <div class="row px-lg-5">
+
+         <div class="col-md-4" *ngFor="let blog of blogs">
+          <a routerLink="/blog/{{blog.slug}}">
+           <div class="card text-start"> <img src="{{blog.blog_banner}}" alt="">
+             <div class="card-body px-2">
+               <h6 class="text-white my-3 text-start">{{blog.heading}}</h6>
+               <p>{{blog?.description}}</p>
+             </div>
+           </div>
+          </a>
+         </div>
+         
+         
+         <div class="col-md-12 mt-5 text-center"> <a routerLink="/blogs" class="btn btn-primary text-dark bg-light">Explore all resources</a> </div>
+       </div>
+     </div>
+   </div>
+   <app-footer-top></app-footer-top>
+   <!-- Footer -->
+   <app-footer></app-footer>
+ </div>

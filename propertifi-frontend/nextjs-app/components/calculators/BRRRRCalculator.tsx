@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
+import { saveCalculation } from '@/lib/saved-calculations-api';
+import AIAnalysisCard from './AIAnalysisCard';
 
 export default function BRRRRCalculator() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     purchasePrice: 150000,
     downPayment: 30000, // Cash used for purchase
@@ -18,6 +22,16 @@ export default function BRRRRCalculator() {
     monthlyRent: 2200,
     monthlyExpenses: 800, // Tax, Insurance, Maintenance, etc. (excluding mortgage)
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Get auth token from localStorage
+  const getAuthToken = () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('auth_token');
+    }
+    return null;
+  };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -27,9 +41,9 @@ export default function BRRRRCalculator() {
   };
 
   const calculateResults = () => {
-    const { 
+    const {
       purchasePrice, downPayment, closingCosts, rehabCosts, rehabDuration,
-      arv, refinanceLTV, refinanceRate, monthlyRent, monthlyExpenses 
+      arv, refinanceLTV, refinanceRate, monthlyRent, monthlyExpenses
     } = formData;
 
     // 1. Total Capital Invested (Initial Cash Needed)
@@ -38,11 +52,11 @@ export default function BRRRRCalculator() {
     // 2. Refinance Numbers
     const newLoanAmount = arv * (refinanceLTV / 100);
     const originalLoanAmount = purchasePrice - downPayment;
-    
+
     // Cash Out = New Loan - Payoff Old Loan
     // Assuming we pay off the original loan balance (simplified, ignoring original loan principal paydown during rehab)
     const cashOutRefi = newLoanAmount - originalLoanAmount;
-    
+
     // Cash Left in Deal = Total Initial Cash - (New Loan - Old Loan)
     // Actually, simpler: Total Invested - Cash Recouped
     // Cash Recouped = New Loan Amount - Old Loan Payoff
@@ -51,7 +65,7 @@ export default function BRRRRCalculator() {
     // Cash Left = Total Project Cost - New Loan Amount
     const totalProjectCost = purchasePrice + closingCosts + rehabCosts;
     const cashLeftInDeal = Math.max(0, totalProjectCost - newLoanAmount);
-    
+
     const cashRecouped = totalInitialCash - cashLeftInDeal;
     const percentCashRecouped = (cashRecouped / totalInitialCash) * 100;
 
@@ -59,7 +73,7 @@ export default function BRRRRCalculator() {
     const monthlyRate = refinanceRate / 100 / 12;
     const n = 30 * 12; // 30 year fixed assumption
     const newMonthlyMortgage = (newLoanAmount * monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
-    
+
     const totalMonthlyExpenses = monthlyExpenses + newMonthlyMortgage;
     const monthlyCashFlow = monthlyRent - totalMonthlyExpenses;
     const annualCashFlow = monthlyCashFlow * 12;
@@ -69,7 +83,7 @@ export default function BRRRRCalculator() {
     // If Cash Left is 0 (Perfect BRRRR), ROI is infinite
     let cashOnCashROI = 0;
     let isInfinite = false;
-    
+
     if (cashLeftInDeal <= 0) {
       isInfinite = true;
     } else {
@@ -105,11 +119,35 @@ export default function BRRRRCalculator() {
     doc.text(`New Loan Amount: $${results.newLoanAmount.toLocaleString()}`, 20, 80);
     doc.text(`Cash Left in Deal: $${results.cashLeftInDeal.toLocaleString()}`, 20, 90);
     doc.text(`Monthly Cash Flow: $${results.monthlyCashFlow.toFixed(2)}`, 20, 100);
-    
+
     const roiText = results.isInfinite ? "Infinite" : `${results.cashOnCashROI.toFixed(2)}%`;
     doc.text(`Cash on Cash ROI: ${roiText}`, 20, 110);
-    
+
     doc.save("brrrr-analysis.pdf");
+  };
+
+  const handleSaveClick = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      router.push('/login?returnUrl=/calculators/brrrr&message=Please login to save your calculations');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await saveCalculation(token, {
+        calculator_type: 'brrrr',
+        input_data: formData,
+        result_data: results,
+      });
+      setSaveMessage({ type: 'success', text: 'Calculation saved successfully!' });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error: any) {
+      console.error('Error saving calculation:', error);
+      setSaveMessage({ type: 'error', text: error.message || 'Failed to save calculation' });
+      setTimeout(() => setSaveMessage(null), 5000);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
@@ -119,7 +157,7 @@ export default function BRRRRCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form Section */}
         <div className="space-y-6">
-          
+
           {/* Purchase Phase */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-blue-900 border-b border-blue-100 pb-2">1. Buy</h2>
@@ -295,14 +333,61 @@ export default function BRRRRCalculator() {
             </div>
           </div>
 
-          <div className="mt-8">
+          {saveMessage && (
+            <div className={`mb-4 p-3 rounded-lg text-center text-sm font-medium ${saveMessage.type === 'success'
+              ? 'bg-green-50 text-green-800 border border-green-200'
+              : 'bg-red-50 text-red-800 border border-red-200'
+              }`}>
+              {saveMessage.text}
+            </div>
+          )}
+
+          <div className="mt-8 space-y-3">
             <Button className="w-full" onClick={handleExport}>
               <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
               Export BRRRR Report
             </Button>
+            <Button variant="outline" className="w-full" onClick={handleSaveClick} disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <BookmarkIcon className="mr-2 h-4 w-4" />
+                  Save Calculation
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* AI Analysis Section */}
+      <AIAnalysisCard
+        calculatorType="brrrr"
+        inputs={{
+          purchasePrice: formData.purchasePrice,
+          rehabCosts: formData.rehabCosts,
+          arv: formData.arv,
+          refinanceLTV: `${formData.refinanceLTV}%`,
+          refinanceRate: `${formData.refinanceRate}%`,
+          monthlyRent: formData.monthlyRent,
+          monthlyExpenses: formData.monthlyExpenses,
+        }}
+        results={{
+          cashOnCashROI: results.isInfinite ? 'Infinite' : `${results.cashOnCashROI.toFixed(2)}%`,
+          monthlyCashFlow: `$${results.monthlyCashFlow.toFixed(2)}`,
+          annualCashFlow: `$${results.annualCashFlow.toFixed(2)}`,
+          cashLeftInDeal: `$${results.cashLeftInDeal.toFixed(2)}`,
+          equity: `$${results.equity.toFixed(2)}`,
+          newLoanAmount: `$${results.newLoanAmount.toFixed(2)}`,
+        }}
+      />
     </div>
   );
 }

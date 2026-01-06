@@ -75,7 +75,7 @@ export default function SettingsPage() {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">
             <User className="h-4 w-4 mr-2" />
             Profile
@@ -83,14 +83,6 @@ export default function SettingsPage() {
           <TabsTrigger value="team">
             <Users className="h-4 w-4 mr-2" />
             Team
-          </TabsTrigger>
-          <TabsTrigger value="notifications">
-            <Bell className="h-4 w-4 mr-2" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="preferences">
-            <Building2 className="h-4 w-4 mr-2" />
-            Preferences
           </TabsTrigger>
           <TabsTrigger value="billing">
             <CreditCard className="h-4 w-4 mr-2" />
@@ -223,9 +215,8 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            member.role === 'Admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.role === 'Admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                            }`}>
                             {member.role}
                           </span>
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -317,199 +308,7 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        {/* Notifications Tab */}
-        <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>Choose how you want to receive notifications</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-start gap-3">
-                  <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-900">Email Notifications</p>
-                    <p className="text-sm text-gray-600">Receive notifications via email</p>
-                  </div>
-                </div>
-                <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
-              </div>
 
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-start gap-3">
-                  <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-900">SMS Notifications</p>
-                    <p className="text-sm text-gray-600">Receive notifications via text message</p>
-                  </div>
-                </div>
-                <Switch checked={smsNotifications} onCheckedChange={setSmsNotifications} />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-start gap-3">
-                  <Bell className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-900">Push Notifications</p>
-                    <p className="text-sm text-gray-600">Receive push notifications in your browser</p>
-                  </div>
-                </div>
-                <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Notification Types</h3>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">New Leads</p>
-                    <p className="text-sm text-gray-600">Get notified when new leads are received</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Lead Updates</p>
-                    <p className="text-sm text-gray-600">Status changes and important updates</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Tour Reminders</p>
-                    <p className="text-sm text-gray-600">Reminders for scheduled property tours</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Application Updates</p>
-                    <p className="text-sm text-gray-600">New applications and status changes</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Weekly Reports</p>
-                    <p className="text-sm text-gray-600">Weekly summary of your performance</p>
-                  </div>
-                  <Switch />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex justify-end">
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Preferences
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Preferences Tab */}
-        <TabsContent value="preferences" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Lead Preferences</CardTitle>
-              <CardDescription>Configure your lead filtering and assignment preferences</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Preferred Property Types</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-300">
-                    <input type="checkbox" defaultChecked className="rounded" />
-                    <span className="text-sm">Residential</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-300">
-                    <input type="checkbox" defaultChecked className="rounded" />
-                    <span className="text-sm">Multi-Family</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-300">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm">Commercial</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-300">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm">Industrial</span>
-                  </label>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <Label>Premium Tier Preference</Label>
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Tiers</SelectItem>
-                    <SelectItem value="premium">Premium Only</SelectItem>
-                    <SelectItem value="standard">Standard Only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Geographic Preference</Label>
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    <Input placeholder="Add city or zip code" className="border-0 p-0 h-auto focus-visible:ring-0" />
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <Label>Auto-Assignment Rules</Label>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Auto-assign new leads</p>
-                      <p className="text-sm text-gray-600">Automatically assign leads based on round-robin</p>
-                    </div>
-                    <Switch />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Prioritize high-value leads</p>
-                      <p className="text-sm text-gray-600">AI-scored leads get priority assignment</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex justify-end gap-3">
-                <Button variant="outline">Reset to Defaults</Button>
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Preferences
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Billing Tab */}
         <TabsContent value="billing" className="space-y-6">

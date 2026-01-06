@@ -8,6 +8,7 @@ import {
   PlusIcon,
   MagnifyingGlassIcon,
   ClipboardDocumentListIcon,
+  CalculatorIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/hooks/useAuth';
 import { getDashboardData } from '@/lib/owner-api';
@@ -117,6 +118,15 @@ export default function OwnerDashboard() {
         >
           <MagnifyingGlassIcon className="h-5 w-5" />
           Find Managers
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          onClick={() => router.push('/calculators')}
+          className="gap-2"
+        >
+          <CalculatorIcon className="h-5 w-5" />
+          Calculators
         </Button>
       </motion.div>
 

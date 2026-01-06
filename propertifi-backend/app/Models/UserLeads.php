@@ -40,6 +40,9 @@ class UserLeads extends Model
         'match_score',
         'distributed_at',
         'viewed_at',
+        'responded_at',
+        'response_notes',
+        'response_type',
         'notes',
     ];
 
@@ -52,6 +55,7 @@ class UserLeads extends Model
         'match_score' => 'integer',
         'distributed_at' => 'datetime',
         'viewed_at' => 'datetime',
+        'responded_at' => 'datetime',
     ];
 
 

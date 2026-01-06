@@ -1,0 +1,65 @@
+<div class="wrapper">
+
+   <!-- Modal -->
+   <div class="modal common-modal d-block">
+   <div class="modal-dialog modal-fullscreen">
+       <div class="modal-content">
+       <div class="modal-header">
+           <h1 class="" id="exampleModalLabel"><img src="assets/img/logo.png"/></h1>
+           <a routerLink="/"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#fff" version="1.1" id="Capa_1" viewBox="0 0 512.021 512.021" style="enable-background:new 0 0 512.021 512.021;" xml:space="preserve" width="24" height="24"><g><path d="M301.258,256.01L502.645,54.645c12.501-12.501,12.501-32.769,0-45.269c-12.501-12.501-32.769-12.501-45.269,0l0,0   L256.01,210.762L54.645,9.376c-12.501-12.501-32.769-12.501-45.269,0s-12.501,32.769,0,45.269L210.762,256.01L9.376,457.376   c-12.501,12.501-12.501,32.769,0,45.269s32.769,12.501,45.269,0L256.01,301.258l201.365,201.387   c12.501,12.501,32.769,12.501,45.269,0c12.501-12.501,12.501-32.769,0-45.269L301.258,256.01z"/></g></svg></a>
+       </div>
+       <div class="modal-body">
+           <div class="common-modal-box">
+               <div class="row">
+               <div class="col-md-6 mx-auto">
+                   <h2 class="mb-3 mb-lg-4">{{pageData?.heading}}</h2>
+                   <form>
+                     
+                     <div class="common-radio mb-4">
+                        <div class="common-inputbox w-100">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" value="{{full_name}}" id="full_name" >
+                        </div>
+                    </div>
+
+                    <div class="common-radio mb-4">
+                     <div class="common-inputbox w-100">
+                     <label for="email_address" class="form-label">Email Address</label>
+                     <input type="text" value="{{email_address}}" class="form-control" id="email_address" >
+                     </div>
+                 </div>
+
+                 <div class="common-radio mb-4">
+                  <div class="common-inputbox w-100">
+                  <label for="phone_no" class="form-label">Phone No.</label>
+                  <input type="text" value="{{phone_no}}" class="form-control" id="phone_number" >
+                  </div>
+                  </div>
+
+                  <div class="common-radio mb-4">
+                     <div class="common-inputbox w-100">
+                     <label for="preferred_contact_method" class="form-label">Preferred Contact Method</label>
+                     <select class="form-select" id="preferred_contact_method">
+                        <option value="">Select</option>
+                        <option value="Email">Email</option>
+                        <option value="Phone">Phone</option>
+                        </select>
+                     </div>
+                     </div>
+
+                  
+
+
+                   </form>
+               </div>
+               </div>
+           </div>
+       </div>
+       <div class="modal-footer align-items-center justify-content-center px-0">
+         <a routerLink="/search-three" class="btn btn-primary" data-bs-dismiss="modal">Previous</a>
+           <a (click)="saveNext()" style="cursor:pointer"  class="btn btn-primary" data-bs-dismiss="modal">Next</a>
+       </div>
+       </div>
+   </div>
+   </div>
+</div>

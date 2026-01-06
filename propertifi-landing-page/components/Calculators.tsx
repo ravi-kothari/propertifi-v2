@@ -9,18 +9,16 @@ const CalculatorCard: React.FC<{
   onClick: () => void;
 }> = ({ title, icon, description, isActive, onClick }) => (
   <motion.div
-    className={`relative p-6 rounded-2xl cursor-pointer border transition-all duration-300 ${
-      isActive
+    className={`relative p-6 rounded-2xl cursor-pointer border transition-all duration-300 ${isActive
         ? 'bg-gradient-to-br from-propertifi-blue to-blue-600 text-white border-transparent shadow-xl'
         : 'bg-white border-gray-100 hover:border-propertifi-blue/30 hover:shadow-lg'
-    }`}
+      }`}
     onClick={onClick}
     whileHover={{ y: -5 }}
     layout
   >
-    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
-      isActive ? 'bg-white/20' : 'bg-blue-50 text-propertifi-blue'
-    }`}>
+    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${isActive ? 'bg-white/20' : 'bg-blue-50 text-propertifi-blue'
+      }`}>
       {icon}
     </div>
     <h3 className={`text-xl font-bold mb-2 ${isActive ? 'text-white' : 'text-gray-900'}`}>{title}</h3>
@@ -111,7 +109,7 @@ const RoiCalculator: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="space-y-4 pt-4 border-t border-gray-800">
             <div className="flex justify-between items-center">
               <div className="text-gray-400 text-sm">Monthly Cash Flow</div>
@@ -259,31 +257,31 @@ const RentVsBuyCalculator: React.FC = () => {
   const interestRate = 6.5; // Fixed assumption
   const monthlyRate = interestRate / 100 / 12;
   const loanTermMonths = 30 * 12;
-  
+
   // Calculate Buying Costs
   const monthlyMortgage = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, loanTermMonths)) / (Math.pow(1 + monthlyRate, loanTermMonths) - 1);
   const monthlyPropertyTax = (homePrice * 0.01) / 12; // 1% annual tax
   const monthlyMaintenance = (homePrice * 0.01) / 12; // 1% annual maintenance
   const monthlyInsurance = 100;
-  
+
   const totalMonthlyBuyCost = monthlyMortgage + monthlyPropertyTax + monthlyMaintenance + monthlyInsurance;
   const totalBuyCostOverPeriod = (totalMonthlyBuyCost * 12 * years) + downPayment;
-  
+
   // Calculate Ending Home Value
   const futureHomeValue = homePrice * Math.pow(1 + (homeAppreciation / 100), years);
   const remainingPrincipal = loanAmount * Math.pow(1 + monthlyRate, years * 12) - (monthlyMortgage * (Math.pow(1 + monthlyRate, years * 12) - 1) / monthlyRate); // Simplified approx
-  
+
   // Actually, accurately remaining principal is tricky without iteration, use simple approximation for equity
   // Or just totalBuyCost - (futureHomeValue - initialLoanAmount)?
   // Let's use: Net Cost of Buying = Total Out of Pocket - Equity Gained
   // Equity = Future Value - Remaining Loan Balance
-  
+
   // Better approximation for Remaining Balance:
   // B = L[ (1+c)^n - (1+c)^p ] / [ (1+c)^n - 1 ]
   // L = loan amount, c = monthly rate, n = total months, p = months elapsed
   const p = years * 12;
   const remainingBalance = loanAmount * (Math.pow(1 + monthlyRate, loanTermMonths) - Math.pow(1 + monthlyRate, p)) / (Math.pow(1 + monthlyRate, loanTermMonths) - 1);
-  
+
   const equity = futureHomeValue - remainingBalance;
   const netBuyCost = totalBuyCostOverPeriod - equity;
 
@@ -373,7 +371,7 @@ const RentVsBuyCalculator: React.FC = () => {
           <div className="text-sm text-gray-400 mt-1">
             by ${Math.abs(difference).toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </div>
-          
+
           <div className="mt-6 w-full pt-6 border-t border-gray-800 space-y-3">
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-400">Net Cost to Buy</span>
@@ -401,10 +399,10 @@ const Calculators: React.FC = () => {
     <section id="calculators" className="py-20 bg-gray-50 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-50 to-transparent opacity-50 pointer-events-none" />
-      
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.span 
+          <motion.span
             className="text-propertifi-blue font-bold tracking-wider uppercase text-sm mb-2 block"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -412,7 +410,7 @@ const Calculators: React.FC = () => {
           >
             Financial Tools
           </motion.span>
-          <motion.h2 
+          <motion.h2
             className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -421,7 +419,7 @@ const Calculators: React.FC = () => {
           >
             Smart Calculators for Smart Investors
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-lg text-gray-600"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -530,7 +528,7 @@ const Calculators: React.FC = () => {
         </div>
 
         {/* New CTA Section */}
-        <motion.div 
+        <motion.div
           className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -543,16 +541,16 @@ const Calculators: React.FC = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
-            <a 
-              href="http://localhost:3001/calculators" 
-              target="_blank" 
+            <a
+              href="https://propertifi.somakaaya.com/public/calculators"
+              target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 bg-white text-propertifi-blue font-bold rounded-xl shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors flex items-center justify-center whitespace-nowrap"
             >
               View All Calculators
             </a>
-            <a 
-              href="#contact" 
+            <a
+              href="#contact"
               className="px-6 py-3 bg-propertifi-orange text-white font-bold rounded-xl shadow-md hover:bg-propertifi-orange-dark transition-colors flex items-center justify-center whitespace-nowrap"
             >
               Sign Up Free

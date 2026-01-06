@@ -53,6 +53,7 @@ services:
     depends_on:
       - backend
     environment:
+      - BACKEND_URL=http://backend:8000
       - NEXT_PUBLIC_API_URL=http://localhost:8001/api
       - NEXT_PUBLIC_MAIN_APP_URL=http://localhost:8001
       - CHOKIDAR_USEPOLLING=true # For hot-reloading in Docker

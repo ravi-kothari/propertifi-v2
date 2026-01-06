@@ -1,0 +1,13 @@
+{
+  "general": {
+    "previewFeatures": true,
+    "vimMode": true,
+    "disableAutoUpdate": false
+  },
+  "output": {
+    "format": "text"
+  },
+  "ui": {
+    "showMemoryUsage": true
+  }
+}

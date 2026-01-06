@@ -1,0 +1,529 @@
+@media screen and (min-width: 320px) and (max-width:767px) {
+
+.main-menu {
+    display: none!important;
+}
+
+.menu-nav {
+    display: block!important;
+    position: absolute;
+    right: 0;
+    width: 50px;
+    top: 0px;
+}
+header {
+    height: auto!important;
+    padding-bottom: 30px;
+}
+
+.desktop{
+    display: none!important;
+}
+
+.close-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.button-box .btns a {
+    font-size: 10px;
+    width: 130px!important;
+    display: block;
+    padding: 10px 13px;
+    text-align: center;
+}
+
+.button-box .btns {
+    margin: 0 10px;
+}
+
+.button-box {
+    margin-top: 30px;
+}
+
+.logo img {
+    width: 170px;
+}
+
+.banner {
+    margin-top: 50px;
+}
+
+.banner h3 {
+    font-size: 25px;
+    line-height: 35px;
+}
+
+.banner p {
+    font-size: 13px;
+    line-height: 21px;
+}
+
+.form-box .nav {
+    width: 100%;
+    display: flex;
+    overflow-x: scroll;
+    flex-wrap: nowrap;
+}
+
+.form-box .nav-link {
+    font-size: 12px;
+    line-height: 0px;
+    margin: 5px;
+    padding-bottom: 14px;
+    min-width: 113px;
+}
+.how-works .card img{
+    margin-bottom: 10px;
+}
+
+.form-box input {
+    font-size: 10px;
+    padding: 20px 10px;
+    width: calc(100% - 85px);
+}
+
+.form-btn {
+    border-radius: 3px;
+    padding: 9px 15px;
+    font-size: 11px;
+    line-height: 19px;
+}
+
+.section-heading h3 {
+    font-size: 20px;
+    line-height: 25px;
+}
+
+.section-heading p {
+    font-size: 11px;
+    line-height: 20px;
+}
+
+.how-works .card h4 {
+    font-size: 14px;
+}
+
+.subscribe-box {
+    padding: 25px 15px;
+    border-radius: 5px;
+}
+
+.pagination a {
+    font-size: 12px;
+}
+
+.subs-box input {
+    width: 155px;
+    font-size: 12px;
+}
+
+.how-works .card p {
+    font-size: 11px;
+    line-height: 20px;
+    line-height: 17px;
+}
+
+.how-works .card a {
+    font-size: 14px;
+}
+
+.right-img {
+    position: unset;
+}
+
+.test-ic {
+    right: 20px;
+}
+
+.test-box p {
+    font-size: 11px;
+    line-height: 18px;
+    opacity: 0.7;
+    margin-top: 23px;
+}
+
+.main-box ul li p {
+    padding: 0 9px;
+    height: 40px;
+    font-size: 12px;
+    margin-bottom: 0px;
+}
+
+ul.state-select {
+    justify-content: space-between;
+}
+
+.state .main-box {
+    margin: 10px 0;
+}
+
+.blog .card p span {
+    font-size: 11px;
+}
+
+.blog .card h4 {
+    font-size: 15px;
+    line-height: 17px;
+    margin-top: 15px;
+}
+
+.blog .card p {
+    font-size: 11px;
+    line-height: 17px;
+    margin-bottom: 0;
+}
+
+.submit-btn {
+    font-size: 11px;
+    line-height: 15px;
+}
+
+.main-box ul li {
+    margin-top: 14px;
+    margin-left: 4px;
+    margin-right: 2px;
+}
+
+.section-padding {
+    padding: 30px 0;
+}
+
+
+
+
+
+/*=============== step form css ============*/
+
+html{
+    overflow-x: hidden;
+}
+
+.step-form::before {
+   content: unset;
+}
+
+.logo-part {
+    background: var(--blue);
+    padding-bottom: 15px;
+}
+
+.form-bx {
+    position: relative;
+    place-items: flex-start;
+    padding-top: 35px;
+    justify-content: center;
+}
+.close-step{
+    display: none;
+}
+/*.form-cont .form-btn {
+    position: absolute;
+    bottom: 10px;
+    max-width: 320px;
+    left: 50%;
+    transform: translateX(-50%);
+}*/
+
+.step-form h3 {
+    margin-top: 40px;
+}
+
+.form-bx li, .form-bx textarea, .form-bx input {
+   /* width:320px!important;*/
+}
+
+
+
+/*========== about listing =======*/
+
+div#nav-tab {
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+}
+
+button.nav-link {
+    min-width: 185px;
+}
+
+.about-listing .nav-tabs .nav-link {
+    padding: 10px 0;
+    margin: 0 5px;
+    font-size: 13px;
+}
+
+.model-bottom {
+    background: #021885;
+    padding: 20px 15px;
+}
+
+.model-top h4 {
+    font-size: 13px;
+}
+
+.model-top p {
+    font-size: 11px;
+    line-height: 16px;
+}
+
+.model-top {
+    padding: 15px 10px;
+}
+
+}
+
+
+
+
+
+@media screen and (min-width: 768px) and (max-width:1023px) {
+
+
+.menu-nav {
+    display: inline-block!important;
+    position: absolute;
+    right: 0;
+    width: 50px;
+}
+header {
+    padding-bottom: 50px;
+}
+.main-menu {
+    display: none!important;
+}
+
+
+.banner {
+    margin-top: 95px;
+}
+
+.how-works .card {
+    height: 400px;
+}
+
+.right-img {
+     position: unset; 
+    transform: translateY(45px);
+}
+
+.section-heading h3 {
+    font-size: 22px;
+    line-height: 35px;
+}
+
+.main-box ul li {
+    margin-top: 0px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.main-box ul li p {
+    padding: 0 8px;
+    font-size: 13px;
+}
+
+.state .main-box {
+    padding: 30px 8px;
+}
+
+.blog .card h4 {
+    font-size: 16px;
+    line-height: 21px;
+    margin-top: 10px
+}
+.blog .card p {
+    font-size: 13px;
+    line-height: 21px;
+    margin-bottom: 0px;
+}
+
+footer .col {
+    min-width: 30%;
+}
+
+.desktop{
+    display: none!important;
+}
+
+.form-box .nav-link {
+    font-size: 14px;
+}
+
+
+
+
+
+
+/*=========== listing page ============*/
+
+.about-listing .nav-tabs .nav-link {
+    margin: 0 15px;
+    font-size: 12px;
+}
+
+.about-listing .card-body p {
+    min-height: 40px;
+}
+
+}
+
+
+
+}
+
+
+
+@media screen and (min-width: 1024px) and (max-width:1365px) {
+
+
+.banner {
+    margin-top: 95px;
+}
+
+.how-works .card {
+    height: 350px;
+}
+
+.test-ic {
+    right: 15px;
+}
+
+.right-img {
+     
+    transform: translateY(45px);
+}
+
+.button-box .btns {
+    margin: 0 8px;
+}
+
+.form-box .nav-link {
+    margin: 10px 4px;
+}
+
+.right-img img {
+    padding-left: 80px;
+}
+
+.section-heading h3 {
+    font-size: 22px;
+    line-height: 35px;
+}
+
+.main-box ul li {
+    margin-top: 0px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.main-box ul li p {
+    padding: 0 8px;
+    font-size: 13px;
+}
+
+.state .main-box {
+    padding: 30px 8px;
+}
+
+.blog .card h4 {
+    font-size: 16px;
+    line-height: 21px;
+    margin-top: 10px
+}
+.blog .card p {
+    font-size: 13px;
+    line-height: 21px;
+    margin-bottom: 0px;
+}
+
+
+
+
+/*=========== listing page ============*/
+
+.about-listing .nav-tabs .nav-link {
+    margin: 0 15px;
+    font-size: 12px;
+}
+
+}
+
+
+
+
+@media screen and (min-width: 1366px) and (max-width:1440px) {
+
+
+.banner {
+    margin-top: 95px;
+}
+
+.how-works .card {
+    height: 350px;
+}
+
+.test-ic {
+    right: 15px;
+}
+
+.right-img {
+     
+    transform: translateY(45px);
+}
+
+.button-box .btns {
+    margin: 0 8px;
+}
+
+.form-box .nav-link {
+    margin: 10px 4px;
+}
+
+.right-img img {
+    padding-left: 80px;
+}
+
+.section-heading h3 {
+    font-size: 26px;
+    line-height: 44px;
+}
+
+/*.main-box ul li {
+    margin-top: 0px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.main-box ul li p {
+    padding: 0 8px;
+    font-size: 13px;
+}*/
+
+.state .main-box {
+    padding: 30px 8px;
+}
+
+.blog .card h4 {
+    font-size: 16px;
+    line-height: 21px;
+    margin-top: 10px
+}
+.blog .card p {
+    font-size: 13px;
+    line-height: 21px;
+    margin-bottom: 0px;
+}
+
+
+
+/*=========== listing page ============*/
+
+.about-listing .nav-tabs .nav-link {
+    margin: 0 15px;
+    font-size: 14px;
+}
+
+}

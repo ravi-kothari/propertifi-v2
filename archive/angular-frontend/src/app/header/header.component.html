@@ -1,0 +1,141 @@
+<header class="header fixed-top"> 
+   <!--Main header start-->
+   <nav class="navbar navbar-expand-lg">
+     <div class="container">
+       <div class="header-start d-flex align-items-center w-75"> <a class="navbar-brand comp-logo" routerLink="/"> <img src="assets/img/logo.png" class="img-fluid" alt=""> </a>
+         <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+           <div class="offcanvas-header">
+             <button type="button" class="btn-close me-auto ms-0" data-bs-dismiss="offcanvas" aria-label="Close"> <img src="assets/new/img/close-x.svg"/> </button>
+           </div>
+           <div class="d-flex flex-column flex-lg-row align-lg-items-center justify-content-between">
+             <ul class="navbar-nav ms-lg-auto me-lg-5">
+               <li class="nav-item dropdown"> <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Solutions <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M7.5 10.5L12 15L16.5 10.5" stroke="currentcolor" stroke-width="1.5"></path>
+                 </svg> </a>
+                 <div class="dropdown-menu px-3 rounded-3 border-0 shadow">
+                   <div class="row">
+                     <div class="col-lg-4">
+                       <div class="title">Property Owners</div>
+                       <a routerLink="/resources"><div class="menu-box">
+                         <h6>Find a Property Manager</h6>
+                         <p>Connect with vetted professionals to manage your single-family homes, condos, or apartments.</p>
+                       </div></a>
+                       <!-- <div class="menu-box">
+                         <h6>Property Laws</h6>
+                         <p>Understand Property Laws by state.</p>
+                       </div> -->
+                       <a routerLink="/faqs"><div class="menu-box">
+                         <h6>Owner Resources</h6>
+                         <p>Access guides, laws, and FAQs to help you make informed decisions.</p>
+                       </div></a>
+                     </div>
+                     <div class="col-lg-4">
+                       <div class="title">Property Managers</div>
+                       <a href="https://www.propertifi.co/agent-panel/admin/create-agent-account"><div class="menu-box">
+                         <h6>Join Our Network</h6>
+                         <p>Expand your client base by connecting with property owners seeking management services.</p>
+                       </div></a>
+                       <a routerLink="/faqs"><div class="menu-box">
+                         <h6>Property Management Resources</h6>
+                         <p>Access industry insights, best practices, and support to grow your business.</p>
+                       </div></a>
+                       
+                     </div>
+                     <div class="col-lg-4"> <a href=""> <img src="assets/new/img/menu-box.jpg" class="img-fluid" alt=""></a> </div>
+                   </div>
+                 </div>
+               </li>
+               <!-- <li class="nav-item dropdown"> <a href="#" class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Products <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M7.5 10.5L12 15L16.5 10.5" stroke="currentcolor" stroke-width="1.5"></path>
+                 </svg> </a>
+                 <div class="dropdown-menu px-3 rounded-3 border-0 shadow second">
+                   <div class="row">
+                     <div class="col-lg-6">
+                       <div class="title">Products</div>
+                       <div class="menu-box">
+                         <h6>Landlord Insurance</h6>
+                         <p>See how instant, tailored coverage moves you forward.</p>
+                       </div>
+                       <div class="menu-box">
+                         <h6>Embedded Insurance</h6>
+                         <p>Integrated. Intuitive. Insurance where it matters most.</p>
+                       </div>
+                     </div>
+                     <div class="col-lg-6"> <a href=""> <img src="assets/new/img/menu-box2.jpg" class="w-100 img-fluid" alt=""></a> </div>
+                   </div>
+                 </div>
+               </li> -->
+               <li class="nav-item dropdown"> <a href="#" class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M7.5 10.5L12 15L16.5 10.5" stroke="currentcolor" stroke-width="1.5"></path>
+                 </svg> </a>
+                 <div class="dropdown-menu px-3 rounded-3 border-0 shadow second">
+                   <div class="row">
+                     <div class="col-lg-6">
+                       <div class="title">Resources</div>
+                       <a routerLink="/blogs"><div class="menu-box">
+                         <h6>Knowledge Hub</h6>
+                         <p>Resources and tips for Property Management.</p>
+                       </div></a>
+                       <a routerLink="/laws"><div class="menu-box">
+                         <h6>Property Laws</h6>
+                         <p>Understand Property Laws by state.</p>
+                       </div></a>
+                       <a routerLink="/blogs"><div class="menu-box">
+                         <h6>Newsroom</h6>
+                         <p>Stay up to date with the latest from Propertifi.</p>
+                       </div></a>
+                     </div>
+                     <div class="col-lg-6"> <a href=""> <img src="assets/new/img/menu-box3.png" class="w-100 img-fluid" alt=""></a> </div>
+                   </div>
+                 </div>
+               </li>
+               <li class="nav-item dropdown"> <a href="#" class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">Company <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.5 10.5L12 15L16.5 10.5" stroke="currentcolor" stroke-width="1.5"></path>
+                </svg> </a>
+                <div class="dropdown-menu px-3 rounded-3 border-0 shadow second">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="title">Company</div>
+                      <a routerLink="/about-us"><div class="menu-box">
+                        <h6>About Us</h6>
+                        <p>Get to know about us.</p>
+                      </div></a>
+                      <a routerLink="/contact-us"><div class="menu-box">
+                        <h6>Connect with Us</h6>
+                        <p>Find the best Property Management Solutions..</p>
+                      </div></a>
+                      <a routerLink="/career"><div class="menu-box">
+                        <h6>Careers</h6>
+                        <p>Stay up to date with the latest from Propertifi.</p>
+                      </div></a>
+                    </div>
+                    <div class="col-lg-6"> <a href=""> <img src="assets/new/img/menu-box3.png" class="w-100 img-fluid" alt=""></a> </div>
+                  </div>
+                </div>
+              </li>
+               
+               <li class="nav-item d-block d-sm-none d-md-none"> <a class="nav-link" href="#">Login <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M7.5 10.5L12 15L16.5 10.5" stroke="currentcolor" stroke-width="1.5"></path>
+                 </svg> </a> </li>
+             </ul>
+           </div>
+         </div>
+       </div>
+       <div class="login position-relative d-none d-md-block ms-auto">
+         <div class="profile ms-auto me-3">Login <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+           <path d="M7.5 10.5L12 15L16.5 10.5" stroke="currentcolor" stroke-width="1.5"></path>
+           </svg> </div>
+         <div class="sub-nav position-absolute">
+           <ul class="w-100">
+             <!-- <li><a href="" class="d-flex align-items-center"><span class="ic"><img src="assets/new/img/Clients.svg" width="24px" alt=""></span> For Clients</a></li> -->
+             <li><a href="https://propertifi.co/agent-panel/" class="d-flex align-items-center"><span class="ic"><img src="assets/new/img/Agents.svg" width="24px" alt=""></span> For Property Managers</a></li>
+           </ul>
+         </div>
+       </div>
+       <div class="header-end d-flex align-items-center"> <a routerLink="/search" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary">Get Started</a>
+         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"> <span class="navbar-toggler-icon"></span> </button>
+       </div>
+     </div>
+   </nav>
+   <!--Main header end--> 
+ </header>

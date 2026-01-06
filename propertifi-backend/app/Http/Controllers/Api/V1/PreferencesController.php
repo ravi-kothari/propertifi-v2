@@ -59,8 +59,8 @@ class PreferencesController extends Controller
             ],
             'subscription' => [
                 'tier_id' => $preferences->tier_id,
-                'tier_name' => $tier->name ?? 'free',
-                'exclusivity_hours' => $tier->exclusivity_hours ?? 0,
+                'tier_name' => $tier ? $tier->name : 'free',
+                'exclusivity_hours' => $tier ? ($tier->exclusivity_hours ?? 0) : 0,
             ],
         ]);
     }
@@ -224,8 +224,8 @@ class PreferencesController extends Controller
                 ],
                 'subscription' => [
                     'tier_id' => $preferences->tier_id,
-                    'tier_name' => $tier->name ?? 'free',
-                    'exclusivity_hours' => $tier->exclusivity_hours ?? 0,
+                    'tier_name' => $tier ? $tier->name : 'free',
+                    'exclusivity_hours' => $tier ? ($tier->exclusivity_hours ?? 0) : 0,
                 ],
             ]
         ]);

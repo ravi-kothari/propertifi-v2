@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\PropertyManager;
 use Illuminate\Http\Request;
 
 class PropertyManagerController extends Controller
@@ -16,59 +16,38 @@ class PropertyManagerController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::where('type', 'User')
-            ->where('status', 1);
+        $query = PropertyManager::query();
 
         // Filter by state if provided
-        if($request->has('state') && $request->state != '') {
-            $query->where('state', $request->state);
+        if ($request->has('state') && $request->state != '') {
+            $query->where('state', strtoupper($request->state));
         }
 
         // Filter by city if provided
-        if($request->has('city') && $request->city != '') {
-            $query->where('city', $request->city);
+        if ($request->has('city') && $request->city != '') {
+            $query->where('city', 'LIKE', '%' . $request->city . '%');
         }
 
         // Filter by verified status if provided
-        if($request->has('verified')) {
+        if ($request->has('verified')) {
             $query->where('is_verified', $request->verified == 'true' ? 1 : 0);
         }
 
-        // Search by name or company
-        if($request->has('search') && $request->search != '') {
-            $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('company_name', 'like', '%' . $request->search . '%');
-            });
+        // Search by name (company name)
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         // Sorting
         $sortBy = $request->input('sort_by', 'name');
         $sortOrder = $request->input('sort_order', 'asc');
 
-        // Prioritize verified PMs if sorting by name
-        if($sortBy == 'name') {
-            $query->orderBy('is_verified', 'desc')
-                  ->orderBy('name', $sortOrder);
-        } else {
-            $query->orderBy($sortBy, $sortOrder);
-        }
+        // Prioritize featured and verified PMs
+        $query->orderBy('is_featured', 'desc')
+            ->orderBy('is_verified', 'desc')
+            ->orderBy($sortBy, $sortOrder);
 
-        $managers = $query->select([
-            'id',
-            'name',
-            'email',
-            'company_name',
-            'photo',
-            'city',
-            'state',
-            'slug',
-            'is_verified',
-            'verified_at',
-            'about',
-            'website',
-            'featured'
-        ])->paginate($request->input('per_page', 20));
+        $managers = $query->paginate($request->input('per_page', 20));
 
         return response()->json([
             'success' => true,
@@ -77,7 +56,67 @@ class PropertyManagerController extends Controller
     }
 
     /**
-     * Get single PM details by slug
+     * Get single PM details by slug (simplified for Next.js)
+     *
+     * @param  string  $slug
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBySlug($slug)
+    {
+        $manager = PropertyManager::where('slug', $slug)->first();
+
+        if (!$manager) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Property manager not found'
+            ], 404);
+        }
+
+        // Get related PMs in the same city (limit 3)
+        $relatedManagers = PropertyManager::where('city', $manager->city)
+            ->where('state', $manager->state)
+            ->where('id', '!=', $manager->id)
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('bbb_rating', 'desc')
+            ->limit(3)
+            ->get(['id', 'name', 'slug', 'bbb_rating', 'logo_url', 'management_fee']);
+
+        return response()->json(array_merge($manager->toArray(), [
+            'related_managers' => $relatedManagers
+        ]));
+    }
+
+    /**
+     * Get PMs by city for directory listing
+     *
+     * @param  string  $state
+     * @param  string  $city
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getByCity($state, $city)
+    {
+        // Convert city slug to proper format (e.g., "los-angeles" -> "Los Angeles")
+        $cityName = str_replace('-', ' ', $city);
+        $cityName = ucwords($cityName);
+
+        $managers = PropertyManager::where('state', strtoupper($state))
+            ->where('city', 'LIKE', '%' . $cityName . '%')
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('bbb_rating', 'desc')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'city' => $cityName,
+            'state' => strtoupper($state),
+            'count' => $managers->count(),
+            'data' => $managers
+        ]);
+    }
+
+    /**
+     * Get single PM details by slug with state/city context
      *
      * @param  string  $state
      * @param  string  $city
@@ -86,47 +125,28 @@ class PropertyManagerController extends Controller
      */
     public function show($state, $city, $slug)
     {
-        $manager = User::where('slug', $slug)
-            ->where('state', $state)
-            ->where('city', $city)
-            ->where('type', 'User')
-            ->where('status', 1)
-            ->select([
-                'id',
-                'name',
-                'email',
-                'company_name',
-                'photo',
-                'city',
-                'state',
-                'slug',
-                'is_verified',
-                'verified_at',
-                'about',
-                'website',
-                'p_contact_name',
-                'p_contact_no',
-                'p_contact_email',
-                'address',
-                'zipcode',
-                'single_family',
-                'multi_family',
-                'association_property',
-                'commercial_property',
-                'units'
-            ])
-            ->first();
+        $manager = PropertyManager::where('slug', $slug)->first();
 
-        if(!$manager) {
+        if (!$manager) {
             return response()->json([
                 'success' => false,
                 'message' => 'Property manager not found'
             ], 404);
         }
 
+        // Get related PMs in the same city (limit 3)
+        $relatedManagers = PropertyManager::where('city', $manager->city)
+            ->where('state', $manager->state)
+            ->where('id', '!=', $manager->id)
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('bbb_rating', 'desc')
+            ->limit(3)
+            ->get(['id', 'name', 'slug', 'bbb_rating', 'logo_url', 'management_fee']);
+
         return response()->json([
             'success' => true,
-            'data' => $manager
+            'data' => $manager,
+            'related_managers' => $relatedManagers
         ]);
     }
 
@@ -138,27 +158,9 @@ class PropertyManagerController extends Controller
      */
     public function getById($id)
     {
-        $manager = User::where('id', $id)
-            ->where('type', 'User')
-            ->where('status', 1)
-            ->select([
-                'id',
-                'name',
-                'email',
-                'company_name',
-                'photo',
-                'city',
-                'state',
-                'slug',
-                'is_verified',
-                'verified_at',
-                'about',
-                'website',
-                'featured'
-            ])
-            ->first();
+        $manager = PropertyManager::find($id);
 
-        if(!$manager) {
+        if (!$manager) {
             return response()->json([
                 'success' => false,
                 'message' => 'Property manager not found'
@@ -170,4 +172,26 @@ class PropertyManagerController extends Controller
             'data' => $manager
         ]);
     }
+
+    /**
+     * Get list of cities with PM counts by state
+     *
+     * @param  string  $state
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCitiesByState($state)
+    {
+        $cities = PropertyManager::where('state', strtoupper($state))
+            ->selectRaw('city, COUNT(*) as manager_count')
+            ->groupBy('city')
+            ->orderBy('manager_count', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'state' => strtoupper($state),
+            'data' => $cities
+        ]);
+    }
 }
+

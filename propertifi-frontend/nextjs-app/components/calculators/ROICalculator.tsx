@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import CalculatorForm from './CalculatorForm';
 import { CalculatorResults } from './CalculatorResults';
+import AIAnalysisCard from './AIAnalysisCard';
 
 export default function ROICalculator() {
   const [formData, setFormData] = useState({
@@ -54,6 +55,27 @@ export default function ROICalculator() {
         <CalculatorForm onFormChange={handleFormChange} />
         <CalculatorResults results={results} />
       </div>
+
+      {/* AI Analysis Section */}
+      {results && (
+        <AIAnalysisCard
+          calculatorType="roi"
+          inputs={{
+            purchasePrice: formData.purchasePrice,
+            downPayment: formData.downPayment,
+            monthlyRent: formData.monthlyRent,
+            monthlyExpenses: formData.monthlyExpenses,
+          }}
+          results={{
+            annualROI: `${(results.annualROI * 100).toFixed(2)}%`,
+            monthlyCashFlow: `$${results.monthlyCashFlow.toFixed(2)}`,
+            annualCashFlow: `$${results.annualCashFlow.toFixed(2)}`,
+            capRate: `${(results.capRate * 100).toFixed(2)}%`,
+            cashOnCashReturn: `${(results.cashOnCashReturn * 100).toFixed(2)}%`,
+            totalInvestment: `$${results.totalInvestment.toFixed(2)}`,
+          }}
+        />
+      )}
     </div>
   );
 }

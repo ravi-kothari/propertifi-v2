@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/app/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   ChevronRight,
@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 // Interface matching the scraped JSON structure
 interface PropertyManager {
   name: string;
+  slug?: string;
   address: string;
   city: string;
   state: string;
@@ -49,7 +50,12 @@ interface PropertyManager {
   lease_renewal_fee: string | null;
   miscellaneous_fees: string | null;
   source_url: string;
+  is_verified?: boolean;
+  is_claimed?: boolean;
 }
+
+// API base URL - adjust for production
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 export default function PropertyManagerDetailPage() {
   const params = useParams();
@@ -60,21 +66,33 @@ export default function PropertyManagerDetailPage() {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 
-  // Mock data fetching - In a real app, this would be a fetch call to your API
-  // identifying the manager by the slug/id
   const [manager, setManager] = useState<PropertyManager | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API fetch with mock data based on the scraped structure
-    // In production, fetch `/api/property-managers/${slug}`
     const fetchManager = async () => {
       setLoading(true);
-      // Simulating a delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+
+      try {
+        // Try fetching from Laravel API
+        const response = await fetch(`${API_BASE_URL}/property-managers/${slug}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          setManager(data);
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.warn('API fetch failed, using mock data:', error);
+      }
+
+      // Fallback to mock data for development
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       setManager({
         name: "Ziprent",
+        slug: "ziprent",
         address: "1150 S Olive St 10th Floor",
         city: "Los Angeles",
         state: "CA",
@@ -173,6 +191,77 @@ export default function PropertyManagerDetailPage() {
         </Container>
       </div>
 
+      {/* Claim/Update Profile Banner - Shows for unverified profiles */}
+      {!manager.is_verified && (
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+          <Container>
+            <div className="py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Is this your company?</h3>
+                  <p className="text-amber-100 text-sm">
+                    This profile is unclaimed. Verify your business to unlock leads, update info, and get priority listing.
+                  </p>
+                </div>
+              </div>
+              <Link href={`/claim-profile/${slug}`} className="flex-shrink-0">
+                <Button className="bg-white text-amber-600 hover:bg-amber-50 font-semibold shadow-lg px-6">
+                  Claim This Profile
+                </Button>
+              </Link>
+            </div>
+          </Container>
+        </div>
+      )}
+
+      {/* Profile Completion Progress - Shows missing info */}
+      {!manager.is_verified && (
+        <div className="bg-slate-100 border-b border-slate-200">
+          <Container>
+            <div className="py-3">
+              <div className="flex items-center gap-3 text-sm">
+                <span className="font-medium text-slate-700">Profile Completion:</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {manager.description ? (
+                    <Badge className="bg-green-100 text-green-700 border-green-200">
+                      <CheckCircle2 className="w-3 h-3 mr-1" /> Description
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-slate-200 text-slate-500 border-slate-300">
+                      Missing: Description
+                    </Badge>
+                  )}
+                  {manager.management_fee ? (
+                    <Badge className="bg-green-100 text-green-700 border-green-200">
+                      <CheckCircle2 className="w-3 h-3 mr-1" /> Pricing
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-slate-200 text-slate-500 border-slate-300">
+                      Missing: Pricing
+                    </Badge>
+                  )}
+                  {manager.phone ? (
+                    <Badge className="bg-green-100 text-green-700 border-green-200">
+                      <CheckCircle2 className="w-3 h-3 mr-1" /> Contact
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-slate-200 text-slate-500 border-slate-300">
+                      Missing: Contact
+                    </Badge>
+                  )}
+                  <Badge className="text-amber-600 border-amber-300 bg-amber-50">
+                    <Shield className="w-3 h-3 mr-1" /> Not Verified
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </div>
+      )}
+
       <Section spacing="md">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -194,10 +283,10 @@ export default function PropertyManagerDetailPage() {
                         {manager.name}
                         <CheckCircle2 className="w-6 h-6 text-blue-500" aria-label="Verified" />
                       </h1>
-                      
+
                       <div className="flex flex-wrap gap-3 mb-4">
                         {manager.bbb_rating && (
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          <Badge className="bg-blue-50 text-blue-700 border-blue-200">
                             BBB Rating: {manager.bbb_rating}
                           </Badge>
                         )}
@@ -207,7 +296,7 @@ export default function PropertyManagerDetailPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-3">
                       {manager.website && (
                         <a href={manager.website} target="_blank" rel="noopener noreferrer">
@@ -216,9 +305,9 @@ export default function PropertyManagerDetailPage() {
                           </Button>
                         </a>
                       )}
-                      <Button 
-                        variant="default" 
-                        size="sm" 
+                      <Button
+                        variant="default"
+                        size="sm"
                         className="gap-2 bg-primary-600 hover:bg-primary-700 text-white shadow-sm"
                         onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
                       >
@@ -328,7 +417,7 @@ export default function PropertyManagerDetailPage() {
             {/* Sidebar - Right 1/3 */}
             <div className="lg:col-span-1">
               <div className="sticky top-8 space-y-6">
-                
+
                 {/* Propertifi Matching CTA - New Upsell */}
                 <Card className="border-none shadow-lg overflow-hidden relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-700"></div>
@@ -467,6 +556,27 @@ export default function PropertyManagerDetailPage() {
                         </a>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+
+                {/* Claim This Profile CTA */}
+                <Card className="border-2 border-dashed border-amber-300 bg-amber-50/50">
+                  <CardContent className="pt-6 text-center">
+                    <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Shield className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <h4 className="font-semibold text-slate-900 mb-2">Is this your company?</h4>
+                    <p className="text-sm text-slate-600 mb-4">
+                      Claim your profile to update information, respond to leads, and get verified.
+                    </p>
+                    <Link href={`/claim-profile/${slug}`}>
+                      <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white">
+                        Claim This Profile
+                      </Button>
+                    </Link>
+                    <p className="text-xs text-slate-500 mt-3">
+                      Free verification • Priority listing • Lead notifications
+                    </p>
                   </CardContent>
                 </Card>
 

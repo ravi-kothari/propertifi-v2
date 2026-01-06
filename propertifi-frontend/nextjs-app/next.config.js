@@ -19,6 +19,10 @@ const nextConfig = {
         source: '/api/backend/:path*',
         destination: `${backendUrl}/api/:path*`,
       },
+      {
+        source: '/api/v1/:path*',
+        destination: `${backendUrl}/api/v1/:path*`,
+      },
     ];
   },
   // Enable static export for SEO pages

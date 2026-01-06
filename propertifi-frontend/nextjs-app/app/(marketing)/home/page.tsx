@@ -2,6 +2,8 @@ import Hero from '@/app/components/landing/Hero';
 import WhyChooseUs from '@/app/components/landing/WhyChooseUs';
 import HowItWorks from '@/app/components/landing/HowItWorks';
 import PropertyTypes from '@/app/components/landing/PropertyTypes';
+import BrowseByLocation from '@/app/components/landing/BrowseByLocation';
+import CalculatorShowcase from '@/app/components/landing/CalculatorShowcase';
 import Testimonials from '@/app/components/landing/Testimonials';
 import Faq from '@/app/components/landing/Faq';
 import News from '@/app/components/landing/News';
@@ -15,6 +17,8 @@ export default function LandingPage() {
       <WhyChooseUs />
       <HowItWorks />
       <PropertyTypes />
+      <BrowseByLocation />
+      <CalculatorShowcase />
       <Testimonials />
       <Faq />
       <News />
@@ -23,3 +27,5 @@ export default function LandingPage() {
     </>
   );
 }
+
+

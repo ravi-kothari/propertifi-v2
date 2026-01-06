@@ -14,30 +14,34 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            // Base data - states, cities, etc.
+                // Base data - states, cities, etc.
             StatesSeeder::class,
             CitiesSeeder::class,
 
-            // Roles must be seeded before Users
+                // Roles must be seeded before Users
             RolesSeeder::class,
+            DefaultRolesSeeder::class, // Add default roles with permissions
 
-            // Users and Leads
+                // Users and Leads
             UsersSeeder::class,
             LeadsSeeder::class,
 
-            // Content
+                // Content
             BlogsSeeder::class,
             TestimonialsSeeder::class,
 
-            // Legal Content and Document Management Seeders
-            // Order matters: Topics and States must be seeded before Law Contents
+                // Legal Content and Document Management Seeders
+                // Order matters: Topics and States must be seeded before Law Contents
             LegalTopicSeeder::class,
             StateProfileSeeder::class,
             StateLawContentSeeder::class,
 
-            // Categories must be seeded before Templates
+                // Categories must be seeded before Templates
             DocumentCategorySeeder::class,
             DocumentTemplateSeeder::class,
+
+                // Property Managers from scraped data
+            PropertyManagerSeeder::class,
         ]);
     }
 }

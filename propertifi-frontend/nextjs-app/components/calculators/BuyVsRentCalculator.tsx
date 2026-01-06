@@ -1,19 +1,31 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
+import { saveCalculation } from '@/lib/saved-calculations-api';
 
 export default function BuyVsRentCalculator() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     monthlyRent: 2500,
     homePrice: 500000,
     years: 5,
-    homeAppreciation: 3, // Annual %
-    rentIncrease: 2, // Annual %
-    investmentReturn: 5, // Annual % on down payment if invested
+    homeAppreciation: 3,
+    rentIncrease: 2,
+    investmentReturn: 5,
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const getAuthToken = () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('auth_token');
+    }
+    return null;
+  };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -29,7 +41,7 @@ export default function BuyVsRentCalculator() {
     const downPaymentPercent = 0.20;
     const downPayment = homePrice * downPaymentPercent;
     const loanAmount = homePrice - downPayment;
-    const interestRate = 6.5; 
+    const interestRate = 6.5;
     const monthlyRate = interestRate / 100 / 12;
     const loanTermMonths = 30 * 12;
 
@@ -46,11 +58,11 @@ export default function BuyVsRentCalculator() {
 
     // 2. Equity & Value at End
     const futureHomeValue = homePrice * Math.pow(1 + (homeAppreciation / 100), years);
-    
+
     // Remaining Principal Balance Formula
     const p = years * 12;
     const remainingBalance = loanAmount * (Math.pow(1 + monthlyRate, loanTermMonths) - Math.pow(1 + monthlyRate, p)) / (Math.pow(1 + monthlyRate, loanTermMonths) - 1);
-    
+
     const equity = futureHomeValue - remainingBalance;
     const netBuyCost = totalBuyOutflow - (equity - sellingCosts); // Net cost after selling and paying off loan
 
@@ -67,7 +79,7 @@ export default function BuyVsRentCalculator() {
     // 4. Opportunity Cost (Investing the Down Payment + Closing Costs)
     const initialInvestment = downPayment + buyingClosingCosts;
     const investmentGains = initialInvestment * Math.pow(1 + (investmentReturn / 100), years) - initialInvestment;
-    
+
     const netRentCost = totalRentOutflow - investmentGains;
 
     return {
@@ -90,16 +102,39 @@ export default function BuyVsRentCalculator() {
     doc.text(`Home Price: $${formData.homePrice.toLocaleString()}`, 20, 40);
     doc.text(`Starting Rent: $${formData.monthlyRent.toLocaleString()}`, 20, 50);
     doc.text("------------------------------------------------", 20, 60);
-    doc.text(`Net Cost to Buy: $${results.netBuyCost.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 20, 70);
-    doc.text(`Net Cost to Rent: $${results.netRentCost.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 20, 80);
-    doc.text(`Home Equity Gained: $${results.equity.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 20, 90);
-    doc.text(`Rent Investment Gains: $${results.investmentGains.toLocaleString(undefined, {maximumFractionDigits: 0})}`, 20, 100);
-    
+    doc.text(`Net Cost to Buy: $${results.netBuyCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 20, 70);
+    doc.text(`Net Cost to Rent: $${results.netRentCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 20, 80);
+    doc.text(`Home Equity Gained: $${results.equity.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 20, 90);
+    doc.text(`Rent Investment Gains: $${results.investmentGains.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 20, 100);
+
     doc.setFontSize(14);
     const verdict = isBuyingCheaper ? "Buying is Cheaper" : "Renting is Cheaper";
-    doc.text(`Verdict: ${verdict} by $${Math.abs(results.difference).toLocaleString(undefined, {maximumFractionDigits: 0})}`, 20, 120);
-    
+    doc.text(`Verdict: ${verdict} by $${Math.abs(results.difference).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 20, 120);
+
     doc.save("buy-vs-rent-analysis.pdf");
+  };
+
+  const handleSaveClick = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      router.push('/login?returnUrl=/calculators/buy-vs-rent&message=Please login to save your calculations');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await saveCalculation(token, {
+        calculator_type: 'buy-vs-rent',
+        input_data: formData,
+        result_data: results,
+      });
+      setSaveMessage({ type: 'success', text: 'Calculation saved successfully!' });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error: any) {
+      setSaveMessage({ type: 'error', text: error.message || 'Failed to save calculation' });
+      setTimeout(() => setSaveMessage(null), 5000);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
@@ -110,7 +145,7 @@ export default function BuyVsRentCalculator() {
         {/* Form Section */}
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">Assumptions</h2>
-          
+
           <div className="space-y-4">
             <div>
               <label htmlFor="homePrice" className="block text-sm font-medium text-gray-700 mb-1">Home Price</label>
@@ -155,7 +190,7 @@ export default function BuyVsRentCalculator() {
                 min="1"
                 max="30"
                 value={formData.years}
-                onChange={(e) => setFormData({...formData, years: Number(e.target.value)})}
+                onChange={(e) => setFormData({ ...formData, years: Number(e.target.value) })}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
               <div className="text-right text-sm text-gray-500">{formData.years} Years</div>
@@ -187,7 +222,7 @@ export default function BuyVsRentCalculator() {
                 />
               </div>
             </div>
-            
+
             <div>
               <label htmlFor="investmentReturn" className="block text-sm font-medium text-gray-700 mb-1">Investment Return %</label>
               <p className="text-xs text-gray-500 mb-1">Return on down payment if invested instead of buying.</p>
@@ -242,10 +277,24 @@ export default function BuyVsRentCalculator() {
             </div>
           </div>
 
-          <div className="mt-8">
+          {saveMessage && (
+            <div className={`mb-4 p-3 rounded-lg text-center text-sm font-medium ${saveMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
+              }`}>
+              {saveMessage.text}
+            </div>
+          )}
+
+          <div className="mt-8 space-y-3">
             <Button className="w-full" onClick={handleExport}>
               <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
               Export PDF Analysis
+            </Button>
+            <Button variant="outline" className="w-full" onClick={handleSaveClick} disabled={isSaving}>
+              {isSaving ? (
+                <><svg className="animate-spin mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>
+              ) : (
+                <><BookmarkIcon className="mr-2 h-4 w-4" />Save Calculation</>
+              )}
             </Button>
           </div>
         </div>

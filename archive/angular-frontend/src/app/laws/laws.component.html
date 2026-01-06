@@ -1,0 +1,35 @@
+
+<div class="wrapper">
+   <app-header></app-header>
+
+   <div class="property-section py-60 mt-66">
+     <div class="container">
+      <div class="row">
+         <div class="col-lg-12">
+           <div class="section-heading">
+             <h3>Landlord <span>Tenant Rights</span></h3>
+             <div  [innerHTML]="pageData?.description">
+              <p class="my-3">Loading...</p>
+             </div>
+        </div>
+     </div>
+       <div class="row align-items-center">
+         
+         <div class="col-lg-12 col-md-12 mx-md-auto state">
+            <div class="main-box" *ngIf="!loader">
+               <ul class="state-select list-unstyled d-flex flex-wrap mb-0">
+                  <li *ngFor="let state of states; let i = index"><a routerLink="/law/{{state.slug}}"><p class="common-state-class" [id]="'state_'+state.id">{{state.state}}</p></a></li>
+               </ul>
+            </div>
+            <div class="main-box text-center" *ngIf="loader">
+              Loading...
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+ 
+   
+   <!-- Footer -->
+   <app-footer></app-footer>
+ </div>

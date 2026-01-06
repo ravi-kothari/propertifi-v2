@@ -12,6 +12,14 @@ import LeadCriteriaTab from './components/LeadCriteriaTab';
 import NotificationsTab from './components/NotificationsTab';
 
 // Types
+export interface ServiceArea {
+  id: string;
+  name: string; // Display name like "San Francisco, CA"
+  latitude: number;
+  longitude: number;
+  radius_miles: number;
+}
+
 export interface PreferencesData {
   profile: {
     name: string;
@@ -22,12 +30,14 @@ export interface PreferencesData {
   };
   leadCriteria: {
     property_types: string[];
-    zip_codes?: string[]; // Optional for backward compatibility
+    service_areas: ServiceArea[];
+    // Legacy fields for backward compatibility
+    zip_codes?: string[];
     min_units: number | null;
     max_units: number | null;
-    service_radius_miles: number;
-    latitude: number | null;
-    longitude: number | null;
+    service_radius_miles?: number;
+    latitude?: number | null;
+    longitude?: number | null;
   };
   notifications: {
     email_notifications: boolean;
@@ -40,12 +50,32 @@ export interface PreferencesData {
   };
 }
 
+// Helper to get auth token from Zustand persist storage
+function getAuthToken(): string | null {
+  try {
+    const authData = localStorage.getItem('propertifi-auth');
+    if (authData) {
+      const parsed = JSON.parse(authData);
+      return parsed.state?.token || null;
+    }
+  } catch (e) {
+    console.error('Failed to parse auth token:', e);
+  }
+  return null;
+}
+
 // API functions
 async function fetchPreferences(): Promise<PreferencesData> {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error('Not authenticated');
+  }
+
   const response = await fetch('/api/v1/preferences', {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Authorization': `Bearer ${token}`,
     },
   });
 
@@ -57,11 +87,17 @@ async function fetchPreferences(): Promise<PreferencesData> {
 }
 
 async function updatePreferences(data: Partial<PreferencesData>): Promise<{ data: PreferencesData }> {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error('Not authenticated');
+  }
+
   const response = await fetch('/api/v1/preferences', {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });

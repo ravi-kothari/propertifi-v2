@@ -1,0 +1,10 @@
+.close-btn{position: absolute;
+    top: 10px;
+    right: 12px;
+    background: #f00;
+    color: #fff;
+    padding: 2px 9px;
+    border-radius: 20px;
+    cursor: pointer;}
+    .modal-header{background: #0c2867;}
+    .btn-close{ background: none !important; opacity:1;margin-right: 10px;}

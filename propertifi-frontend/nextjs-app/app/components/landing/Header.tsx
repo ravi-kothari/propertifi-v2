@@ -17,10 +17,10 @@ const PropertifiLogo: React.FC = () => (
       whileHover={{ rotate: 360 }}
       transition={{ duration: 0.6, ease: "easeInOut" }}
     >
-      <path d="M16 2L2 9V23L16 30L30 23V9L16 2Z" fill="#3B82F6"/>
-      <path d="M16 10L2 17L16 24L30 17L16 10Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M2 9L16 16V30" stroke="#BFDBFE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M30 9L16 16" stroke="#BFDBFE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M16 2L2 9V23L16 30L30 23V9L16 2Z" fill="#3B82F6" />
+      <path d="M16 10L2 17L16 24L30 17L16 10Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2 9L16 16V30" stroke="#BFDBFE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M30 9L16 16" stroke="#BFDBFE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </motion.svg>
     <span className="font-extrabold text-2xl text-propertifi-gray-900">PROPERTIFI</span>
   </div>
@@ -41,18 +41,16 @@ const Header: React.FC = () => {
 
   const navLinks = [
     { name: 'Home', href: '/home' },
-    { name: 'How It Works', href: '/home#how-it-works' },
-    { name: 'Property Types', href: '/home#property-types' },
-    { name: 'FAQ', href: '/home#faq' },
+    { name: 'Find Managers', href: '/property-managers' },
+    { name: 'Top 100', href: '/top-property-managers' },
+    { name: 'Calculators', href: '/calculators' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Contact', href: '/home#contact' },
   ];
 
   return (
     <motion.header
-      className={`bg-white/90 backdrop-blur-lg sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'shadow-md py-2' : 'shadow-sm py-0'
-      }`}
+      className={`bg-white/90 backdrop-blur-lg sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'shadow-md py-2' : 'shadow-sm py-0'
+        }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -88,53 +86,27 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center space-x-4">
-            {/* Owner Login */}
-            <Link href="/login?type=owner">
+          <div className="hidden lg:flex items-center space-x-3">
+            {/* Login Button */}
+            <Link href="/login">
               <motion.div
-                className="text-sm font-semibold text-propertifi-gray-700 hover:text-propertifi-blue-dark transition-colors flex items-center group cursor-pointer px-3 py-2 rounded-lg hover:bg-propertifi-blue-light/30"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className="text-sm font-semibold text-propertifi-gray-700 hover:text-propertifi-blue-dark transition-colors px-4 py-2 rounded-lg hover:bg-propertifi-blue-light/30"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 group-hover:rotate-12 transition-transform" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                </svg>
-                Owner Login
+                Login
               </motion.div>
             </Link>
 
-            {/* Property Manager Login */}
-            <Link href="/login?type=manager">
-              <motion.div
-                className="text-sm font-semibold text-propertifi-gray-700 hover:text-propertifi-orange-dark transition-colors flex items-center group cursor-pointer px-3 py-2 rounded-lg hover:bg-propertifi-orange-light/20"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 group-hover:rotate-12 transition-transform" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                </svg>
-                Manager Login
-              </motion.div>
-            </Link>
-
+            {/* Get Started CTA */}
             <motion.a
               href="/get-started"
-              className="bg-propertifi-orange hover:bg-propertifi-orange-dark text-white font-bold py-2 px-5 rounded-full transition-all duration-300 shadow-md hover:shadow-lg"
+              className="bg-propertifi-orange hover:bg-propertifi-orange-dark text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
               Get Started
             </motion.a>
-
-            <motion.span
-              className="text-sm font-bold text-propertifi-gray-900 flex items-center"
-              whileHover={{ scale: 1.05 }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-propertifi-orange" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-              </svg>
-              916-250-1264
-            </motion.span>
           </div>
 
           <div className="lg:hidden">
@@ -176,36 +148,17 @@ const Header: React.FC = () => {
                 </motion.div>
               ))}
 
-              <div className="border-t border-gray-200 pt-4 flex flex-col space-y-4">
-                {/* Owner Login */}
-                <Link href="/login?type=owner">
+              <div className="border-t border-gray-200 pt-4 flex flex-col space-y-3">
+                {/* Login */}
+                <Link href="/login">
                   <motion.div
-                    className="text-base font-semibold text-propertifi-gray-700 hover:text-propertifi-blue-dark transition-colors flex items-center py-2 px-4 rounded-lg hover:bg-propertifi-blue-light cursor-pointer"
+                    className="text-base font-semibold text-propertifi-gray-700 hover:text-propertifi-blue-dark transition-colors py-2 px-4 rounded-lg hover:bg-propertifi-blue-light cursor-pointer"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: navLinks.length * 0.05 }}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                    </svg>
-                    Owner Login
-                  </motion.div>
-                </Link>
-
-                {/* Property Manager Login */}
-                <Link href="/login?type=manager">
-                  <motion.div
-                    className="text-base font-semibold text-propertifi-gray-700 hover:text-propertifi-orange-dark transition-colors flex items-center py-2 px-4 rounded-lg hover:bg-propertifi-orange-light/20 cursor-pointer"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: (navLinks.length + 0.5) * 0.05 }}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                    Manager Login
+                    Login
                   </motion.div>
                 </Link>
 
@@ -215,21 +168,10 @@ const Header: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: (navLinks.length + 1) * 0.05 }}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Get Started
                 </motion.a>
-
-                <motion.span
-                  className="text-base font-bold text-propertifi-gray-900 text-center flex items-center justify-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: (navLinks.length + 2) * 0.05 }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-propertifi-orange" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                  916-250-1264
-                </motion.span>
               </div>
             </nav>
           </motion.div>

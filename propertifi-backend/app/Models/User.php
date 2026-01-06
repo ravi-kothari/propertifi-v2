@@ -97,6 +97,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'verified_at' => 'datetime',
     ];
 
+    /**
+     * Appended attributes for API responses.
+     *
+     * @var array<string>
+     */
+    protected $appends = ['permissions'];
+
 	public function GetRecordById($id){
 		return $this::where('id', $id)->first();
 	}
@@ -272,5 +279,90 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canManageRoles()
     {
         return $this->hasPermission('manage_roles');
+    }
+
+    /**
+     * Get the user's permissions array.
+     * This is automatically appended to the model's array/JSON representation.
+     *
+     * @return array
+     */
+    public function getPermissionsAttribute()
+    {
+        // Admin and AccountManager have all permissions
+        if ($this->isAdmin() || $this->type === 'AccountManager') {
+            // Return all available permissions for admin users
+            return $this->getAllAvailablePermissions();
+        }
+
+        // Load role relationship if not already loaded
+        if (!$this->relationLoaded('role')) {
+            $this->load('role');
+        }
+
+        // Return role permissions or empty array
+        return $this->role?->permissions ?? [];
+    }
+
+    /**
+     * Get all available permissions in the system.
+     * Used for admin users who have access to everything.
+     *
+     * @return array
+     */
+    private function getAllAvailablePermissions()
+    {
+        return [
+            // User Management
+            'view_users',
+            'create_users',
+            'edit_users',
+            'delete_users',
+            'manage_users',
+
+            // Role Management
+            'view_roles',
+            'create_roles',
+            'edit_roles',
+            'delete_roles',
+            'manage_roles',
+
+            // Property Management
+            'view_properties',
+            'create_properties',
+            'edit_properties',
+            'delete_properties',
+            'manage_properties',
+
+            // Lead Management
+            'view_leads',
+            'create_leads',
+            'edit_leads',
+            'delete_leads',
+            'assign_leads',
+            'manage_leads',
+
+            // Analytics & Reports
+            'view_analytics',
+            'view_reports',
+            'export_reports',
+
+            // Settings
+            'manage_settings',
+            'manage_system_settings',
+
+            // Billing
+            'view_billing',
+            'manage_billing',
+            'view_invoices',
+
+            // Support
+            'view_support_tickets',
+            'manage_support_tickets',
+
+            // Marketplace
+            'view_marketplace',
+            'manage_marketplace',
+        ];
     }
 }

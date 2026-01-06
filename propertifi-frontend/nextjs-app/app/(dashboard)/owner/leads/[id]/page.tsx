@@ -241,32 +241,100 @@ export default function LeadDetailPage() {
                   {assignments.map((assignment) => (
                     <div
                       key={assignment.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                      className="p-4 bg-gray-50 rounded-lg border border-gray-200"
                     >
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {assignment.manager_name}
-                        </p>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                          {assignment.distance_miles && (
-                            <span>{assignment.distance_miles.toFixed(1)} miles</span>
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {assignment.manager_name}
+                          </p>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                            {assignment.distance_miles && (
+                              <span>{assignment.distance_miles.toFixed(1)} miles</span>
+                            )}
+                            <span>Score: {assignment.match_score}%</span>
+                          </div>
+                        </div>
+                        <Badge
+                          className={
+                            assignment.status === 'accepted'
+                              ? 'bg-green-100 text-green-700'
+                              : assignment.status === 'contacted'
+                                ? 'bg-purple-100 text-purple-700'
+                                : assignment.status === 'rejected'
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-gray-100 text-gray-700'
+                          }
+                        >
+                          {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                        </Badge>
+                      </div>
+
+                      {/* PM Response Status Timeline */}
+                      <div className="flex flex-wrap gap-3 text-xs border-t border-gray-200 pt-3 mt-2">
+                        {/* Distributed */}
+                        <div className="flex items-center gap-1">
+                          <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                          <span className="text-gray-600">Sent</span>
+                          {assignment.distributed_at && (
+                            <span className="text-gray-400">
+                              {format(new Date(assignment.distributed_at), 'MMM d')}
+                            </span>
                           )}
-                          <span>Score: {assignment.match_score}%</span>
+                        </div>
+
+                        {/* Viewed Status */}
+                        <div className="flex items-center gap-1">
+                          {assignment.viewed_at ? (
+                            <>
+                              <EyeIcon className="h-4 w-4 text-blue-500" />
+                              <span className="text-blue-600 font-medium">Viewed</span>
+                              <span className="text-gray-400">
+                                {format(new Date(assignment.viewed_at), 'MMM d')}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <ClockIcon className="h-4 w-4 text-gray-300" />
+                              <span className="text-gray-400">Not viewed</span>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Response Status */}
+                        <div className="flex items-center gap-1">
+                          {assignment.responded_at ? (
+                            <>
+                              {assignment.response_type === 'interested' || assignment.response_type === 'contacted' ? (
+                                <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <ClockIcon className="h-4 w-4 text-orange-500" />
+                              )}
+                              <span className={`font-medium ${assignment.response_type === 'interested' ? 'text-green-600' :
+                                  assignment.response_type === 'contacted' ? 'text-blue-600' :
+                                    assignment.response_type === 'declined' ? 'text-red-600' :
+                                      'text-gray-600'
+                                }`}>
+                                {assignment.response_type?.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Responded'}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <ClockIcon className="h-4 w-4 text-gray-300" />
+                              <span className="text-gray-400">Awaiting response</span>
+                            </>
+                          )}
                         </div>
                       </div>
-                      <Badge
-                        className={
-                          assignment.status === 'accepted'
-                            ? 'bg-green-100 text-green-700'
-                            : assignment.status === 'contacted'
-                            ? 'bg-purple-100 text-purple-700'
-                            : assignment.status === 'rejected'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-gray-100 text-gray-700'
-                        }
-                      >
-                        {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
-                      </Badge>
+
+                      {/* Response Notes */}
+                      {assignment.response_notes && (
+                        <div className="mt-3 p-2 bg-white rounded border border-gray-100">
+                          <p className="text-xs text-gray-700">
+                            <span className="font-medium">PM Notes:</span> {assignment.response_notes}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

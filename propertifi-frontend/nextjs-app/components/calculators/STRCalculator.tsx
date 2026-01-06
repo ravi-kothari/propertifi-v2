@@ -1,35 +1,34 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, BookmarkIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
+import { saveCalculation } from '@/lib/saved-calculations-api';
 
 export default function STRCalculator() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    // Revenue
     nightlyRate: 250,
-    occupancyRate: 70, // %
-    // Long Term Comparison
-    longTermRent: 3500, // Monthly
-    
-    // Startup Costs
+    occupancyRate: 70,
+    longTermRent: 3500,
     furnishingCost: 15000,
-    
-    // Operating Expenses
-    managementFeePercent: 20, // STR management is usually 20-30%
+    managementFeePercent: 20,
     cleaningFeePerStay: 120,
     avgStaysPerMonth: 6,
-    utilities: 300, // Monthly (Owner pays for STR)
+    utilities: 300,
     internet: 80,
-    supplies: 100, // Toilet paper, coffee, etc.
-    platformFeePercent: 3, // Airbnb host fee approx
-    
-    // Property Expenses (Fixed)
+    supplies: 100,
+    platformFeePercent: 3,
     mortgage: 2500,
     propertyTax: 500,
-    insurance: 200, // STR insurance is higher
+    insurance: 200,
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const getAuthToken = () => { if (typeof window !== 'undefined') return localStorage.getItem('auth_token'); return null; };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -39,7 +38,7 @@ export default function STRCalculator() {
   };
 
   const calculateResults = () => {
-    const { 
+    const {
       nightlyRate, occupancyRate, longTermRent, furnishingCost,
       managementFeePercent, cleaningFeePerStay, avgStaysPerMonth,
       utilities, internet, supplies, platformFeePercent,
@@ -52,27 +51,27 @@ export default function STRCalculator() {
     // Note: Cleaning fees are usually passed through, but let's assume they wash out or are included in gross for simplicity here, 
     // OR strictly: Revenue = (Rate * Nights) + (CleaningFee * Stays). Expense = CleaningCost * Stays.
     // Let's assume Nightly Rate is the base rate revenue.
-    
+
     // STR Variable Expenses
     const monthlyCleaningCost = cleaningFeePerStay * avgStaysPerMonth;
     const monthlyManagementFee = grossMonthlyRevenue * (managementFeePercent / 100);
     const monthlyPlatformFee = grossMonthlyRevenue * (platformFeePercent / 100);
     const monthlySupplies = supplies;
     const monthlyUtilities = utilities + internet;
-    
+
     const totalVariableExpenses = monthlyCleaningCost + monthlyManagementFee + monthlyPlatformFee + monthlySupplies + monthlyUtilities;
-    
+
     // Fixed Expenses
     const totalFixedExpenses = mortgage + propertyTax + insurance;
-    
+
     // Net Operating Income (STR)
     const strNetIncome = grossMonthlyRevenue - totalVariableExpenses - totalFixedExpenses;
-    
+
     // Long Term Rental Comparison
     // LTR Expenses (Owner usually doesn't pay utilities, management is lower ~8-10%)
-    const ltrManagementFee = longTermRent * 0.08; 
+    const ltrManagementFee = longTermRent * 0.08;
     const ltrMaintenance = longTermRent * 0.05; // 5% reserve
-    const ltrNetIncome = longTermRent - (mortgage + propertyTax + (insurance * 0.7)) - ltrManagementFee - ltrMaintenance; 
+    const ltrNetIncome = longTermRent - (mortgage + propertyTax + (insurance * 0.7)) - ltrManagementFee - ltrMaintenance;
     // Assuming LTR insurance is 30% cheaper
 
     return {
@@ -97,14 +96,26 @@ export default function STRCalculator() {
     doc.text(`Occupancy Rate: ${formData.occupancyRate}%`, 20, 40);
     doc.text(`Gross Monthly Revenue: $${results.grossMonthlyRevenue.toLocaleString()}`, 20, 50);
     doc.text("------------------------------------------------", 20, 60);
-    doc.text(`STR Monthly Net Income: $${results.strNetIncome.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 20, 70);
-    doc.text(`Long-Term Monthly Net Income: $${results.ltrNetIncome.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 20, 80);
-    
+    doc.text(`STR Monthly Net Income: $${results.strNetIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, 20, 70);
+    doc.text(`Long-Term Monthly Net Income: $${results.ltrNetIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, 20, 80);
+
     doc.setFontSize(14);
     const verdict = isSTRBetter ? "STR is More Profitable" : "Long-Term is More Profitable";
-    doc.text(`Verdict: ${verdict} by $${Math.abs(results.difference).toLocaleString(undefined, {maximumFractionDigits: 0})}/mo`, 20, 100);
-    
+    doc.text(`Verdict: ${verdict} by $${Math.abs(results.difference).toLocaleString(undefined, { maximumFractionDigits: 0 })}/mo`, 20, 100);
+
     doc.save("str-analysis.pdf");
+  };
+
+  const handleSaveClick = async () => {
+    const token = getAuthToken();
+    if (!token) { router.push('/login?returnUrl=/calculators/short-term-rental&message=Please login'); return; }
+    setIsSaving(true);
+    try {
+      await saveCalculation(token, { calculator_type: 'short-term-rental', input_data: formData, result_data: results });
+      setSaveMessage({ type: 'success', text: 'Saved!' }); setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error: any) {
+      setSaveMessage({ type: 'error', text: error.message || 'Failed' }); setTimeout(() => setSaveMessage(null), 5000);
+    } finally { setIsSaving(false); }
   };
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
@@ -114,7 +125,7 @@ export default function STRCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form Section */}
         <div className="space-y-6">
-          
+
           {/* Revenue Assumptions */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-blue-900 border-b border-blue-100 pb-2">Revenue Assumptions</h2>
@@ -155,7 +166,7 @@ export default function STRCalculator() {
                   type="number"
                   name="utilities"
                   value={formData.utilities + formData.internet} // Simplified input
-                  onChange={(e) => setFormData({...formData, utilities: Number(e.target.value)})}
+                  onChange={(e) => setFormData({ ...formData, utilities: Number(e.target.value) })}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
@@ -268,10 +279,12 @@ export default function STRCalculator() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <Button className="w-full" onClick={handleExport}>
-              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              Export Analysis PDF
+          {saveMessage && (<div className={`mb-4 p-3 rounded-lg text-center text-sm font-medium ${saveMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>{saveMessage.text}</div>)}
+
+          <div className="mt-8 space-y-3">
+            <Button className="w-full" onClick={handleExport}><ArrowDownTrayIcon className="mr-2 h-4 w-4" />Export Analysis PDF</Button>
+            <Button variant="outline" className="w-full" onClick={handleSaveClick} disabled={isSaving}>
+              {isSaving ? (<><svg className="animate-spin mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : (<><BookmarkIcon className="mr-2 h-4 w-4" />Save Calculation</>)}
             </Button>
           </div>
         </div>

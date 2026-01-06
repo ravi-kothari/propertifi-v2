@@ -1,0 +1,74 @@
+<nav>
+    <div class="container">
+       <div class="row align-items-center position-relative">
+          <a href="" class="menu-nav" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions" style="display: none;">
+             <span>
+                <img src="/assets/img/menu-bar.png" width="30" alt="">
+             </span>
+          </a>
+          <div class="col-md-3 col-lg-2 d-flex align-items-center justify-content-between">
+             <div class="logo">
+                <a routerLink="/" title="logo">
+                   <img src="assets/img/logo.png" class="img-fluid" width="230" alt="">
+                </a>
+             </div>
+          </div>
+          <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+             <div class="offcanvas-header">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+             </div>
+             <div class="offcanvas-body">
+                <ul class="ps-0 list-unstyled text-dark">
+                 <li class="my-2"><a routerLink="/" class="active">Home</a></li>
+                 <!-- <li class="my-2"><a routerLink="/resources">Resources</a></li> -->
+                 <li class="dropdown my-2">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
+                   <ul class="dropdown-menu">
+                     <li><a class="dropdown-item" routerLink="/laws">Laws</a></li>
+                     <li><a class="dropdown-item" routerLink="/blogs">Blog</a></li>
+                     <li><a class="dropdown-item" routerLink="/faqs">FAQ’s</a></li>
+                   </ul>            
+                 </li>
+                 <li class="my-2"><a routerLink="/about-us">About Us</a></li>
+                </ul>
+                <div class="button-box d-flex align-items-center justify-content-lg-end">
+                   <div class="btns">
+                      <a href="https://propertifi.co/agent-panel/" class="form-btn">Sign In</a>
+                   </div>
+                   <div class="btns lightblue">
+                      <a style="cursor:pointer" data-bs-toggle="modal" data-bs-target="#signupModal">Join Our Network &#x27F6;</a>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div class="col-lg-6 col-md-2">
+             <div class="main-menu d-flex justify-content-center">
+                <ul class="nav">
+                 <li class="my-2"><a routerLink="/" class="active">Home</a></li>
+                 <!-- <li class="my-2"><a routerLink="/resources">Resources</a></li> -->
+                 <li class="dropdown my-2">
+                  <a class="nav-link dropdown-toggle mt-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
+                   <ul class="dropdown-menu propertify-dropdown">
+                     <li><a class="dropdown-item" routerLink="/laws">Laws</a></li>
+                     <li><a class="dropdown-item" routerLink="/blogs">Blog</a></li>
+                     <li><a class="dropdown-item" routerLink="/faqs">FAQ’s</a></li>
+                   </ul>            
+                 </li>
+                 <li class="my-2"><a routerLink="/about-us">About Us</a></li>
+                </ul>
+                
+             </div>
+          </div>
+          <div class="col-lg-4 col-md-7">
+             <div class="button-box desktop d-flex align-items-center justify-content-lg-end">
+                <div class="btns">
+                   <a href="https://propertifi.co/agent-panel/">Sign In</a>
+                </div>
+                <div class="btns lightblue">
+                   <a style="cursor:pointer" data-bs-toggle="modal" data-bs-target="#signupModal">Join Our Network &#x27F6;</a>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </nav>

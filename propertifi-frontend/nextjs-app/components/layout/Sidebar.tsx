@@ -5,13 +5,12 @@ import { usePathname } from 'next/navigation';
 import {
   Home,
   Users,
-  Building2,
-  Calendar,
   Mail,
   BarChart3,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  SlidersHorizontal
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -35,16 +34,6 @@ const navItems: NavItem[] = [
     icon: Users,
   },
   {
-    name: 'Properties',
-    href: '/property-manager/properties',
-    icon: Building2,
-  },
-  {
-    name: 'Calendar',
-    href: '/property-manager/calendar',
-    icon: Calendar,
-  },
-  {
     name: 'Inbox',
     href: '/property-manager/inbox',
     icon: Mail,
@@ -53,6 +42,11 @@ const navItems: NavItem[] = [
     name: 'Analytics',
     href: '/property-manager/analytics',
     icon: BarChart3,
+  },
+  {
+    name: 'Preferences',
+    href: '/property-manager/preferences',
+    icon: SlidersHorizontal,
   },
   {
     name: 'Settings',

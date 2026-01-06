@@ -29,7 +29,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, ind
       <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-propertifi-orange-light transition-colors">
         {title}
       </h3>
-      <p className="text-gray-300 leading-relaxed">{description}</p>
+      <p className="text-gray-200 leading-relaxed">{description}</p>
     </div>
 
     {/* Decorative gradient line */}
@@ -87,33 +87,11 @@ const WhyChooseUs: React.FC = () => {
 
   return (
     <section className="section-padding bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 relative overflow-hidden">
-      {/* Background decorations */}
+      {/* Background with subtle static accents - cleaner without animated orbs */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('https://picsum.photos/id/1015/1920/1080')] bg-cover bg-center opacity-5"></div>
-        <motion.div
-          className="absolute top-20 left-20 w-96 h-96 bg-propertifi-blue rounded-full opacity-20 blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 50, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-20 w-96 h-96 bg-propertifi-orange rounded-full opacity-20 blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            x: [0, -50, 0],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+        <div className="absolute inset-0 bg-gradient-to-br from-propertifi-blue/5 via-transparent to-propertifi-orange/5"></div>
+        <div className="absolute top-20 left-20 w-96 h-96 bg-propertifi-blue rounded-full opacity-10 blur-3xl" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-propertifi-orange rounded-full opacity-10 blur-3xl" />
       </div>
 
       <div className="container-custom relative z-10">
@@ -138,7 +116,7 @@ const WhyChooseUs: React.FC = () => {
             </span>
           </h2>
 
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
             We work tirelessly to find the best Property Managers so you don't have to. Here's what makes Propertifi the smarter choice.
           </p>
         </motion.div>
@@ -174,7 +152,7 @@ const WhyChooseUs: React.FC = () => {
               >
                 10K+
               </motion.div>
-              <div className="text-gray-400 text-sm md:text-base">Properties Matched</div>
+              <div className="text-gray-300 text-sm md:text-base">Properties Matched</div>
             </div>
 
             <div className="text-white">
@@ -187,7 +165,7 @@ const WhyChooseUs: React.FC = () => {
               >
                 500+
               </motion.div>
-              <div className="text-gray-400 text-sm md:text-base">Verified Managers</div>
+              <div className="text-gray-300 text-sm md:text-base">Verified Managers</div>
             </div>
 
             <div className="text-white">
@@ -200,7 +178,7 @@ const WhyChooseUs: React.FC = () => {
               >
                 4.9
               </motion.div>
-              <div className="text-gray-400 text-sm md:text-base">Average Rating</div>
+              <div className="text-gray-300 text-sm md:text-base">Average Rating</div>
             </div>
 
             <div className="text-white">
@@ -213,7 +191,7 @@ const WhyChooseUs: React.FC = () => {
               >
                 50+
               </motion.div>
-              <div className="text-gray-400 text-sm md:text-base">States Covered</div>
+              <div className="text-gray-300 text-sm md:text-base">States Covered</div>
             </div>
           </div>
         </motion.div>
